@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DEEP IN OUTER SPACE</title>
+    <link rel="stylesheet" href="../input.css">
+    <style>
+        body { 
+            margin: 0; 
+            -webkit-font-smoothing:
+            antialiased;
+        }
+    </style>
+  </head>
+  <body>
+    <div class="flex h-screen bg-black">
+        <div id="sidePanel" class="w-1/4 flex flex-col justify-center px-8">
+            <h1 class="text-center text-white px-4 text-2xl">TRAVIS.LAMBERTE.COM</h1><br>
+            <a title="Return to Game Menu!" id="enterButton" class="text-green-600 bg-white font-bold text-center border-2 border-green-600 inline-block text-2xl px-4 rounded-full" href="../arcade/index.html">ENTER</a> <br>	
+
+            <h1 class="text-center text-white px-8 text-2xl">& HIRE ME TODAY</h1>
+            <br><br>
+
+            <div class="border-2 rounded-lg">
+                <h1 class="text-white">Ship Controls</h1><br>
+                <h2 id="engineStatus" class="text-green-600 px-8">ENGINE: READY</h2>
+                <br>
+                <H2 class="text-green-600 px-8">CURRENT POSITION: </H2>
+                
+                <div class="px-8">
+                    <button id="button2" class="text-white bg-black bg-opacity-0 inline-block px-4 py-1 rounded-full">TRAVIS-PRIME</button>
+                </div>
+                <br>
+                <H1 class="text-green-600 px-8">TRAVEL TO:</H1>
+                <br>
+                <div class="px-8">
+                    <button id="button1" class="text-white bg-green-600 inline-block px-4 py-1 rounded-full">TRAVIS-CENTAURI</button>
+                </div>
+                <br><br>
+                <div class="border-2 rounded-lg">
+                    <H1 id="shipStatus1" class="text-green-600 px-8">STATUS: READY</H1>
+                    <H1 id="shipStatus2" class="text-green-600 px-8">HIRE ME TODAY!</H1> 
+                </div>
+            </div>
+        </div>
+        
+        <div id="canvasContainer" class="w-3/4">
+            <canvas></canvas>
+        </div>
+    </div>
+
+
+    <script type="module" src="orbit.js"></script>
+  </body>
+</html>
