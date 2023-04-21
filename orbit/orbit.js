@@ -5,22 +5,6 @@ const scene = new THREE.Scene();
 const canvasContainer = document.querySelector('#canvasContainer') //Grab canvas Container from document
 const sidePanel = document.querySelector('#sidePanel') // add sidePanel to the DOM
 
-//animate Enter Button
-const enterButton = document.getElementById('enterButton')
-const enterMotion = gsap.timeline({ paused: true, yoyo: true})
-enterMotion.to(enterButton, {duration: .5, y: -2, rotation: 0, text: '<ENTER>'})
-enterMotion.to(enterButton, {duration: .5, y: -4, rotation: 0, text: '<<ENTER>>'})
-enterMotion.to(enterButton, {duration: .5, y: -2, rotation: 0, text: '<ENTER>'})
-enterMotion.to(enterButton, {duration: .5, y: 0, rotation: 0, text: 'ENTER'})
-
-
-enterButton.addEventListener("mouseenter", animateEnterButton)
-
-function animateEnterButton(){
-    if (!enterMotion.isActive()){
-        enterMotion.play(0)
-    }
-}
 
 //window.innerWidth Handler - for differently sized devices
 if (window.innerWidth < 1160){
@@ -52,7 +36,7 @@ renderer.setPixelRatio(window.devicePixelRatio);
 renderer.shadowMap.enabled = true;
 
 //add ambient light source
-const light = new THREE.AmbientLight( 0xFFFFFF, .04 );
+const light = new THREE.AmbientLight( 0xFFFFFF, 0.1 );
 scene.add( light );
 
 //add sun light source
