@@ -4,8 +4,10 @@ import { Flip } from "gsap/Flip";
 import { EaselPlugin } from "gsap/EaselPlugin";
 import { TextPlugin } from "gsap/TextPlugin";
 import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import * as CANNON from 'cannon-es';
 import CannonDebugger from 'cannon-es-debugger';
+
 
 
 gsap.registerPlugin(Flip, EaselPlugin, TextPlugin);
@@ -40,6 +42,10 @@ renderer.setSize( canvasContainer.offsetWidth, canvasContainer.offsetHeight );
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.shadowMap.enabled = true;
 
+//initialize OrbitControls
+const controls = new OrbitControls( camera, renderer.domElement )
+controls.update()
+
 //add ambient light source
 const light = new THREE.AmbientLight( 0xFFFFFF, 0.5 );
 scene.add( light );
@@ -62,7 +68,7 @@ physicsWorld.addBody(groundBody);
 const blockPhysicsArray = [];
 const blockVisualArray = []
 //create block function
-function createBlock(blockName, x, y, z, rotation){
+function createBlock(blockName, x, y, z){
   const blockWidth = .25;
   const blockLength = .75;
   const blockHeight = .15;
@@ -84,9 +90,9 @@ function createBlock(blockName, x, y, z, rotation){
 
   }
 
-createBlock('block100', 0, 0, 0, 90)
-createBlock('block200', 0, 0, .50, 90)
-createBlock('block200', 0, 0, 1.0, 90)
+createBlock('block100', 0, 0, 0)
+createBlock('block200', 0, 0, .51)
+createBlock('block200', 0, 0, 1.02)
 
 console.log(blockPhysicsArray, blockVisualArray)
 
