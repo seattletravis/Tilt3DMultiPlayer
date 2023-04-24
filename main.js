@@ -29,7 +29,7 @@ window.onresize = function(){
 
 //create camera object
 const camera = new THREE.PerspectiveCamera( 39, canvasContainer.offsetWidth / canvasContainer.offsetHeight, 0.5, 1000 );
-camera.position.set(0, 7, -5)
+camera.position.set(7, 10, -15)
 camera.lookAt(0, 0, 0)
 
 //create renderer
@@ -64,37 +64,47 @@ const groundBody = new CANNON.Body({
 groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0); //rotate groundBody 90 degrees on X-axis
 physicsWorld.addBody(groundBody);
 
-
+// create block arrays
+let blockShape = {W: 0.25, L: 0.75, H: 0.15}
+let blockShape2 = {W: 0.75, L: 0.25, H: 0.15}
+// let blockPosition = {X: 0, Y: 0, Z: 0}
 const blockPhysicsArray = [];
 const blockVisualArray = []
 //create block function
-function createBlock(blockName, x, y, z){
-  const blockWidth = .25;
-  const blockLength = .75;
-  const blockHeight = .15;
-  const mass = 5;
+function createBlock(blockName, blockPosition, blockShape){
+  const mass = 1;
     blockName = new CANNON.Body({ //physics part of block
       mass: mass,
-      shape: new CANNON.Box(new CANNON.Vec3(blockLength, blockHeight, blockWidth)),
+      shape: new CANNON.Box(new CANNON.Vec3(blockShape.L, blockShape.H, blockShape.W)),
     })
-    blockName.position.set(x, y, z);
+    blockName.position.set(blockPosition.X, blockPosition.Y, blockPosition.Z);
     physicsWorld.addBody(blockName)   
     blockPhysicsArray.push(blockName)//add the blocks to List blockPhysicsArray
-
     blockName = new THREE.Mesh( //visual part of block
-    new THREE.BoxGeometry(blockLength*2, blockHeight*2, blockWidth*2),
+    new THREE.BoxGeometry(blockShape.L*2, blockShape.H*2, blockShape.W*2),
     new THREE.MeshNormalMaterial(),
   );
   scene.add(blockName)
-  blockVisualArray.push(blockName)
-
+  blockVisualArray.push(blockName)//add the visual part of the block to the blockVisualArray list
   }
 
-createBlock('block100', 0, 0, 0)
-createBlock('block200', 0, 0, .51)
-createBlock('block200', 0, 0, 1.02)
-
-console.log(blockPhysicsArray, blockVisualArray)
+  //create tower Function
+  for(let i = 0; i <= 8; i++){
+    let blockLayer = i
+  
+    // console.log(blockLayer, blockSequence)
+    let PosY = i*0.29 + .15
+    if(blockLayer%2 == 0){
+      createBlock('block100', {X: 0, Y: PosY, Z: 0}, blockShape)
+      createBlock('block100', {X: 0, Y: PosY, Z: .52}, blockShape)
+      createBlock('block100', {X: 0, Y: PosY, Z: 1.04}, blockShape)
+    }
+    else{
+      createBlock('block100', {X: 0.51, Y: PosY, Z: .53}, blockShape2)
+      createBlock('block100', {X: 0, Y: PosY, Z: .53}, blockShape2)
+      createBlock('block100', {X: -.51, Y: PosY, Z: .53}, blockShape2)
+    }
+  }
 
 
 function linkPhysics() {
@@ -105,29 +115,6 @@ function linkPhysics() {
   }
 }
 
-
-
-
-//create and add sphere to world at y=10
-// const blockWidth = .25;
-// const blockLength = .75;
-// const blockHeight = .15;
-// const blockPhysicsBody = new CANNON.Body({ //physics part of sphere
-//   mass: 5,
-//   shape: new CANNON.Box(new CANNON.Vec3(blockLength, blockHeight, blockWidth)),
-// })
-// blockPhysicsBody.position.set(0, 7, 0);
-// physicsWorld.addBody(blockPhysicsBody)
-// const sphereVisualBody = new THREE.Mesh( //visual part of sphere
-//   new THREE.SphereGeometry(radius),
-//   new THREE.MeshNormalMaterial(),
-// );
-// scene.add(sphereVisualBody)
-
-
-
-
-
 const cannonDebugger = new CannonDebugger(scene, physicsWorld,{
 })
 
@@ -137,6 +124,7 @@ function animate() {
   physicsWorld.fixedStep()
   cannonDebugger.update()
   linkPhysics()
+ 
 
 
 
