@@ -4,13 +4,21 @@ import { Flip } from "gsap/Flip";
 import { EaselPlugin } from "gsap/EaselPlugin";
 import { TextPlugin } from "gsap/TextPlugin";
 import * as THREE from 'three';
+import * as CANNON from 'cannon-es';
+import CannonDebugger from 'cannon-es-debugger';
+
 
 gsap.registerPlugin(Flip, EaselPlugin, TextPlugin);
 
-//create three objects
+//create three objects - initialize THREE
 const scene = new THREE.Scene();
 const canvasContainer = document.querySelector('#canvasContainer') //Grab canvas Container from document
 const sidePanel = document.querySelector('#sidePanel') // add sidePanel to the DOM
+
+//create physics engine - initialize CANNON
+const physicsWorld = new CANNON.World({
+  gravity: new CANNON.Vec3(0, -9.8, 0) //keeping gravity the same as earth YAY!
+})
 
 //Window resize handler
 window.onresize = function(){ 
@@ -18,8 +26,8 @@ window.onresize = function(){
 }
 
 //create camera object
-const camera = new THREE.PerspectiveCamera( 39, canvasContainer.offsetWidth / canvasContainer.offsetHeight, 0.5, 20000 );
-camera.position.set(0, 0, -20)
+const camera = new THREE.PerspectiveCamera( 39, canvasContainer.offsetWidth / canvasContainer.offsetHeight, 0.5, 1000 );
+camera.position.set(0, 7, -5)
 camera.lookAt(0, 0, 0)
 
 //create renderer
@@ -40,24 +48,97 @@ scene.add( light );
 // const sunlight = new THREE.PointLight( 0xFFFFFF, 2, 10000)
 // sunlight.castShadow = true;
 // scene.add( sunlight )
-// sunlight.position.set = (0, 0, 0)
+// sunlight.position.set = (0, 50, 220)
 
-//add cube to the world 
-const cube = new THREE.Mesh(
-  new THREE.BoxGeometry(1, 1, 1),
-  new THREE.MeshStandardMaterial({color: 0xFF0000})
-)
-scene.add(cube)
+// add ground bodu to the static plane
+const groundBody = new CANNON.Body({
+  type: CANNON.Body.STATIC, // infinite geometric plane
+  shape: new CANNON.Plane()
+}) 
+groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0); //rotate groundBody 90 degrees on X-axis
+physicsWorld.addBody(groundBody);
 
 
+const blockPhysicsArray = [];
+const blockVisualArray = []
+//create block function
+function createBlock(blockName, x, y, z, rotation){
+  const blockWidth = .25;
+  const blockLength = .75;
+  const blockHeight = .15;
+  const mass = 5;
+    blockName = new CANNON.Body({ //physics part of block
+      mass: mass,
+      shape: new CANNON.Box(new CANNON.Vec3(blockLength, blockHeight, blockWidth)),
+    })
+    blockName.position.set(x, y, z);
+    physicsWorld.addBody(blockName)   
+    blockPhysicsArray.push(blockName)//add the blocks to List blockPhysicsArray
+
+    blockName = new THREE.Mesh( //visual part of block
+    new THREE.BoxGeometry(blockLength*2, blockHeight*2, blockWidth*2),
+    new THREE.MeshNormalMaterial(),
+  );
+  scene.add(blockName)
+  blockVisualArray.push(blockName)
+
+  }
+
+createBlock('block100', 0, 0, 0, 90)
+createBlock('block200', 0, 0, .50, 90)
+createBlock('block200', 0, 0, 1.0, 90)
+
+console.log(blockPhysicsArray, blockVisualArray)
+
+
+function linkPhysics() {
+  for (let i = 0; i < blockPhysicsArray.length; i++){
+    // console.log(blockPhysicsArray[i], blockVisualArray[i])
+    blockVisualArray[i].position.copy(blockPhysicsArray[i].position)
+    blockVisualArray[i].quaternion.copy(blockPhysicsArray[i].quaternion)
+  }
+}
+
+
+
+
+//create and add sphere to world at y=10
+// const blockWidth = .25;
+// const blockLength = .75;
+// const blockHeight = .15;
+// const blockPhysicsBody = new CANNON.Body({ //physics part of sphere
+//   mass: 5,
+//   shape: new CANNON.Box(new CANNON.Vec3(blockLength, blockHeight, blockWidth)),
+// })
+// blockPhysicsBody.position.set(0, 7, 0);
+// physicsWorld.addBody(blockPhysicsBody)
+// const sphereVisualBody = new THREE.Mesh( //visual part of sphere
+//   new THREE.SphereGeometry(radius),
+//   new THREE.MeshNormalMaterial(),
+// );
+// scene.add(sphereVisualBody)
+
+
+
+
+
+const cannonDebugger = new CannonDebugger(scene, physicsWorld,{
+})
 
 //ANIMATION FUNCTION
 function animate() {
   requestAnimationFrame( animate );
-  cube.rotation.y += .05
-  cube.rotation.z += .01
+  physicsWorld.fixedStep()
+  cannonDebugger.update()
+  linkPhysics()
+
+
+
 
   renderer.render( scene, camera );
 }
 
 animate();
+
+
+

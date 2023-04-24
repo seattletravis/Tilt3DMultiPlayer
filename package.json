@@ -16,6 +16,8 @@
     "vite": "^4.3.0"
   },
   "dependencies": {
+    "cannon-es": "^0.20.0",
+    "cannon-es-debugger": "^1.0.0",
     "three": "^0.151.3"
   }
 }
