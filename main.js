@@ -21,12 +21,14 @@ const physicsWorld = new CANNON.World({
   // frictionGravity: new CANNON.Vec3(10, 10, 0),
 })
 
+//ENVIRONMENTAL VARIABLES
+physicsWorld.allowSleep = true;
 // physicsWorld.defaultContactMaterial.contactEquationRelaxation = 3 //default = 3
-physicsWorld.defaultContactMaterial.contactEquationStiffness = 1e30 //default 10,000,000
+physicsWorld.defaultContactMaterial.contactEquationStiffness = 1e7 //default 10,000,000
 // physicsWorld.defaultContactMaterial.friction = .3 //default = 0.3
 // physicsWorld.defaultContactMaterial.frictionEquationRelaxation = 3 //default = 3
 // physicsWorld.defaultContactMaterial.frictionEquationStiffness = 10000000 //default = 10,000,000
-
+physicsWorld.defaultContactMaterial.contactEquationRelaxationTime = 3
 // let frict = 10
 // let rest = 0
 
@@ -42,7 +44,6 @@ console.log(physicsWorld.defaultContactMaterial)
 window.onresize = function(){ 
     location.reload();
 }
-
 
 //create camera object
 const camera = new THREE.PerspectiveCamera( 39, canvasContainer.offsetWidth / canvasContainer.offsetHeight, 0.5, 1000 );
@@ -81,9 +82,9 @@ let groundLength = 1
 const groundBody = new CANNON.Body({
   shape: new CANNON.Box(new CANNON.Vec3(groundWidth, groundLength, groundHeight)),
   type: CANNON.Body.STATIC, // infinite geometric plane
-  // linearDamping: .9,
+  // linearDamping: .02,
   // angularDamping: .02,
-  sleepSpeedLimit: 1,
+  sleepSpeedLimit: 10, //SLEEP SPEED LIMIT FOR TABLE
 }) 
 groundBody.position.set(0, -.40, .5)
 groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0); //rotate groundBody 90 degrees on X-axis
@@ -97,17 +98,18 @@ groundVisualBody.position.copy(groundBody.position)
 groundVisualBody.quaternion.copy(groundBody.quaternion)
 
 // create block arrays
-let blockShape = {W: 0.25, L: 0.75, H: 0.15}
-let blockShape2 = {W: 0.75, L: 0.25, H: 0.15}
-// let blockPosition = {X: 0, Y: 0, Z: 0}
+let blockShape = {W: 0.25, L: 0.75, H: 0.15};
+let blockShape2 = {W: 0.75, L: 0.25, H: 0.15};
 const blockPhysicsArray = [];
-const blockVisualArray = []
+const blockVisualArray = [];
+
 //create block function
 function createBlock(blockName, blockPosition, blockShape){
   const mass = 0.00001;
     blockName = new CANNON.Body({ //physics part of block
       mass: mass,      
       shape: new CANNON.Box(new CANNON.Vec3(blockShape.L, blockShape.H, blockShape.W)),
+      sleepSpeedLimit: .006, //SLEEP SPEED LIMIT FOR BLOCKS
     })
     blockName.position.set(blockPosition.X, blockPosition.Y, blockPosition.Z);
     physicsWorld.addBody(blockName)  
@@ -120,8 +122,8 @@ function createBlock(blockName, blockPosition, blockShape){
   blockVisualArray.push(blockName)//add the visual part of the block to the blockVisualArray list
   }
 
-  //create tower Function
-  for(let i = 0; i <= 16; i++){
+  //create tower Function - makes calls to createBlock()
+  for(let i = 0; i <= 17; i++){ //use i <= 17 for 54 blocks
     let blockLayer = i
     let PosY = i*0.30 + .01 
     if(blockLayer%2 == 0){
@@ -136,24 +138,20 @@ function createBlock(blockName, blockPosition, blockShape){
     }
   }
 
-
-  //apply gravity gradually Here
+  // apply gravity gradually Here - Allows blocks to settle
   const settleBLocks = gsap.timeline({})
   settleBLocks.to(physicsWorld.gravity,{
-      duration: 5,
-      y: -0.1,
-      onComplete: () => {
-        console.log(physicsWorld.gravity)
-    }
+    duration: 5,
+    y: -0.1,
+    onComplete: () => { console.log(physicsWorld.gravity) }
   });
   settleBLocks.to(physicsWorld.gravity,{
-    duration: 20,
+    duration: 10,
     y: -9.8,
-    onComplete: () => {
-      console.log(physicsWorld.gravity)
-    }
+    onComplete: () => { console.log(physicsWorld.gravity) }
   });
 
+  //Function to apply visual bodies to physics bodies - call from animate()
 function linkPhysics() {
   for (let i = 0; i < blockPhysicsArray.length; i++){
     blockVisualArray[i].position.copy(blockPhysicsArray[i].position)
@@ -161,6 +159,21 @@ function linkPhysics() {
   }
 }
 
+//Grab button1 from html
+const explodeButton = document.getElementById('button1')
+//Explodes tower
+function explodeTower() {
+  for (let i = 0; i < blockPhysicsArray.length; i++){
+    blockPhysicsArray[i].applyImpulse(new CANNON.Vec3(0, -0.00001, 0), new CANNON.Vec3(0, 0.00001, 0));
+    blockPhysicsArray[i].sleepSpeedLimit = 0;
+  }
+physicsWorld.defaultContactMaterial.contactEquationRelaxation = 0 //default = 3
+}
+explodeButton.addEventListener('click', function(){ //give Button functionality
+  explodeTower()
+})
+
+//Cannon Debugger
 const cannonDebugger = new CannonDebugger(scene, physicsWorld,{
 })
 
