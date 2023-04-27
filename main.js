@@ -98,6 +98,22 @@ groundVisualBody.userData.ground = true;
 groundVisualBody.position.copy(groundBody.position)
 groundVisualBody.quaternion.copy(groundBody.quaternion)
 
+
+// Click marker (Sphere) to be shown on interaction
+const markerGeometry = new THREE.SphereGeometry(0.1, 8, 8)
+const markerMaterial = new THREE.MeshLambertMaterial({ color: 0xff0000 })
+let clickMarker = new THREE.Mesh(markerGeometry, markerMaterial)
+clickMarker.visible = false // Hide it..
+scene.add(clickMarker)
+
+// Movement plane when dragging
+const planeGeometry = new THREE.PlaneGeometry(100, 100)
+const floorMaterial = new THREE.MeshLambertMaterial({ color: 0xff0000 })
+
+let movementPlane = new THREE.Mesh(planeGeometry, floorMaterial)
+movementPlane.visible = true // Hide it..
+scene.add(movementPlane)
+
 // create block arrays
 let blockShape = {W: 0.25, L: 0.75, H: 0.15};
 let blockShape2 = {W: 0.75, L: 0.25, H: 0.15};
@@ -186,29 +202,22 @@ explodeButton.addEventListener('click', function(){ //give Button functionality
   explodeTower()
 })
 
-// const pointer = new THREE.Vector2();
-// const raycaster = new THREE.Raycaster();
+//Get the point where raycaster hits the object
+function getHitPoint(clientX, clientY, mesh, camera) {
+  const mouse = new THREE.Vector2()
+  mouse.x = ((clientX - sidePanel.offsetWidth) / canvasContainer.offsetWidth) * 2 - 1
+  mouse.y = -((clientY / window.innerHeight) * 2 - 1)
+  raycaster.setFromCamera(mouse, camera)  // Get the picking ray from the point
+  const hits = raycaster.intersectObject(mesh)  // Find out if there's a hit
+  return hits.length > 0 ? hits[0].point : undefined // Return the closest hit or undefined
+}
 
-// // Retrieve objects touched by pointer
-// const onMouseMove = (event) => {
-//   //calculate pointer position in normalized device coordinates
-//   //(-1 to +1) for both components
+function moveMovementPlane(point, camera){
+  movementPlane.Position.copy(point)
+  movementPlane.quaternion.copy(point)
+}
 
-//   // X pointer equation needs to take into account the sidePanel Width
-//   pointer.x = ((event.clientX - sidePanel.offsetWidth) / canvasContainer.offsetWidth) * 2 - 1;
-//   pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
-//   raycaster.setFromCamera(pointer, camera)
-//   const intersects = raycaster.intersectObjects(scene.children);
-//   // for (let i = 0; i < intersects.length; i++){
-//   //   intersects[i].object.material.color.set(0xff0000)
-//   // }
-//   if(intersects.length > 0){
-//     intersects[0].object.material.color.set(0xff0000)
-//     console.log(intersects[0].object)
-//   }
-// }
-// window.addEventListener('mousemove', onMouseMove);
-
+//declare const for raycasting
 const raycaster = new THREE.Raycaster();
 const clickMouse = new THREE.Vector2();
 const moveMouse = new THREE.Vector2();
@@ -227,33 +236,17 @@ window.addEventListener('pointerdown', event => {
     holdingTile = true;
     console.log(`found draggable ${draggable.userData.name}`)
 
-
+    const hitPoint = getHitPoint(event.clientX, event.clientY, draggable, camera)
+    console.log(hitPoint)
+    if (!hitPoint){ return }
+    clickMarker.visible = true; //showClickMarker Function
+    clickMarker.position.copy(hitPoint) //moveClickMarker Function
+    //moveMovement(point, camera)
 
 
   }
 })
 
-// window.addEventListener('pointerdown', (event) => {
-//   // Cast a ray from where the mouse is pointing and
-//   // see if we hit something
-//   const hitPoint = getHitPoint(event.clientX, event.clientY, cubeMesh, camera)
-//   // Return if the cube wasn't hit
-//   if (!hitPoint) {
-//     return
-//   }
-//   // Move marker mesh on contact point
-//   showClickMarker()
-//   moveClickMarker(hitPoint)
-//   // Move the movement plane on the z-plane of the hit
-//   moveMovementPlane(hitPoint, camera)
-//   // Create the constraint between the cube body and the joint body
-//   addJointConstraint(hitPoint, cubeBody)
-//   // Set the flag to trigger pointermove on next frame so the
-//   // movementPlane has had time to move
-//   requestAnimationFrame(() => {
-//     isDragging = true
-//   })
-// })
 
 
 //When Release Mouse Clicker, show tile that's being dropped

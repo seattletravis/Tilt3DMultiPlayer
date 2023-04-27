@@ -32,11 +32,8 @@ import CannonDebugger from 'cannon-es-debugger';
       const meshes = []
       const bodies = []
 
-      initThree()
-      initCannon()
-      animate()
 
-      function initThree() {
+
         // Camera
         camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.5, 1000)
         camera.position.set(0, 2, 10)
@@ -64,31 +61,25 @@ import CannonDebugger from 'cannon-es-debugger';
         // Lights
         const ambientLight = new THREE.AmbientLight(0x666666)
         scene.add(ambientLight)
-
         const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2)
         const distance = 20
         directionalLight.position.set(-distance, distance, distance)
-
         directionalLight.castShadow = true
-
         directionalLight.shadow.mapSize.width = 2048
         directionalLight.shadow.mapSize.height = 2048
-
         directionalLight.shadow.camera.left = -distance
         directionalLight.shadow.camera.right = distance
         directionalLight.shadow.camera.top = distance
         directionalLight.shadow.camera.bottom = -distance
-
         directionalLight.shadow.camera.far = 3 * distance
         directionalLight.shadow.camera.near = distance
-
         scene.add(directionalLight)
 
         // Raycaster for mouse interaction
         raycaster = new THREE.Raycaster()
 
         // Floor
-        const floorGeometry = new THREE.PlaneBufferGeometry(100, 100, 1, 1)
+        const floorGeometry = new THREE.PlaneGeometry(100, 100, 1, 1)
         floorGeometry.rotateX(-Math.PI / 2)
         const floorMaterial = new THREE.MeshLambertMaterial({ color: 0x777777 })
         const floor = new THREE.Mesh(floorGeometry, floorMaterial)
@@ -96,14 +87,14 @@ import CannonDebugger from 'cannon-es-debugger';
         scene.add(floor)
 
         // Click marker to be shown on interaction
-        const markerGeometry = new THREE.SphereBufferGeometry(0.2, 8, 8)
+        const markerGeometry = new THREE.SphereGeometry(0.2, 8, 8)
         const markerMaterial = new THREE.MeshLambertMaterial({ color: 0xff0000 })
         clickMarker = new THREE.Mesh(markerGeometry, markerMaterial)
         clickMarker.visible = false // Hide it..
         scene.add(clickMarker)
 
         // Cube
-        const cubeGeometry = new THREE.BoxBufferGeometry(1, 1, 1, 10, 10)
+        const cubeGeometry = new THREE.BoxGeometry(1, 1, 1, 10, 10)
         const cubeMaterial = new THREE.MeshPhongMaterial({ color: 0x999999 })
         cubeMesh = new THREE.Mesh(cubeGeometry, cubeMaterial)
         cubeMesh.castShadow = true
@@ -111,13 +102,12 @@ import CannonDebugger from 'cannon-es-debugger';
         scene.add(cubeMesh)
 
         // Movement plane when dragging
-        const planeGeometry = new THREE.PlaneBufferGeometry(100, 100)
+        const planeGeometry = new THREE.PlaneGeometry(100, 100)
         movementPlane = new THREE.Mesh(planeGeometry, floorMaterial)
         movementPlane.visible = false // Hide it..
         scene.add(movementPlane)
 
         window.addEventListener('resize', onWindowResize)
-      }
 
       function onWindowResize() {
         camera.aspect = window.innerWidth / window.innerHeight
@@ -125,7 +115,6 @@ import CannonDebugger from 'cannon-es-debugger';
         renderer.setSize(window.innerWidth, window.innerHeight)
       }
 
-      function initCannon() {
         // Setup world
         world = new CANNON.World()
         world.gravity.set(0, -10, 0)
@@ -152,7 +141,7 @@ import CannonDebugger from 'cannon-es-debugger';
         jointBody.collisionFilterGroup = 0
         jointBody.collisionFilterMask = 0
         world.addBody(jointBody)
-      }
+      
 
       window.addEventListener('pointerdown', (event) => {
         // Cast a ray from where the mouse is pointing and
@@ -293,3 +282,4 @@ import CannonDebugger from 'cannon-es-debugger';
 
         stats.update()
       }
+      animate()
