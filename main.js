@@ -4,7 +4,7 @@ import { Flip } from "gsap/Flip";
 import { EaselPlugin } from "gsap/EaselPlugin";
 import { TextPlugin } from "gsap/TextPlugin";
 import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+// import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import * as CANNON from 'cannon-es';
 import CannonDebugger from 'cannon-es-debugger';
 
@@ -47,8 +47,8 @@ window.onresize = function(){
 
 //create camera object
 const camera = new THREE.PerspectiveCamera( 39, canvasContainer.offsetWidth / canvasContainer.offsetHeight, 0.5, 1000 );
-camera.position.set(10, 10, -15)
-camera.lookAt(0, 0, 0)
+camera.position.set(10, 10, -5)
+camera.lookAt(0, 3, 0)
 
 //create renderer
 const renderer = new THREE.WebGLRenderer(
@@ -61,8 +61,8 @@ renderer.setPixelRatio(window.devicePixelRatio);
 renderer.shadowMap.enabled = true;
 
 //initialize OrbitControls
-const controls = new OrbitControls( camera, renderer.domElement )
-controls.update()
+// const controls = new OrbitControls( camera, renderer.domElement )
+// controls.update()
 
 // add ambient light source
 const light = new THREE.AmbientLight( 0xFFFFFF, 0.5 );
@@ -94,6 +94,7 @@ const groundVisualBody = new THREE.Mesh( //visual part of ground
   new THREE.MeshNormalMaterial()
 )
 scene.add(groundVisualBody)
+groundVisualBody.userData.ground = true;
 groundVisualBody.position.copy(groundBody.position)
 groundVisualBody.quaternion.copy(groundBody.quaternion)
 
@@ -116,9 +117,10 @@ function createBlock(blockName, blockPosition, blockShape){
     blockPhysicsArray.push(blockName)//add the blocks to List blockPhysicsArray
     blockName = new THREE.Mesh( //visual part of block
     new THREE.BoxGeometry(blockShape.L*2, blockShape.H*2, blockShape.W*2),
-    new THREE.MeshNormalMaterial(),
+    new THREE.MeshPhongMaterial({ color: 0xfafafa}),
   );
   scene.add(blockName)
+  blockName.userData.draggable = true;
   blockVisualArray.push(blockName)//add the visual part of the block to the blockVisualArray list
   }
 
@@ -137,6 +139,14 @@ function createBlock(blockName, blockPosition, blockShape){
       createBlock('block100', {X: -.50, Y: PosY, Z: .50}, blockShape2)
     }
   }
+
+  //give all the tiles names in their userData
+  for (let i = 1; i < scene.children.length; i++){
+    if (scene.children[i].userData.draggable == true){
+      scene.children[i].userData.name = 'tile'+ i
+    }
+  }
+
 
   // apply gravity gradually Here - Allows blocks to settle
   const settleBLocks = gsap.timeline({})
@@ -168,10 +178,107 @@ function explodeTower() {
     blockPhysicsArray[i].sleepSpeedLimit = 0;
   }
 physicsWorld.defaultContactMaterial.contactEquationRelaxation = 0 //default = 3
+
+setTimeout( function() { location.reload() }, 3000 ) //reset tower
 }
+//Turn Button On - ARMED
 explodeButton.addEventListener('click', function(){ //give Button functionality
   explodeTower()
 })
+
+// const pointer = new THREE.Vector2();
+// const raycaster = new THREE.Raycaster();
+
+// // Retrieve objects touched by pointer
+// const onMouseMove = (event) => {
+//   //calculate pointer position in normalized device coordinates
+//   //(-1 to +1) for both components
+
+//   // X pointer equation needs to take into account the sidePanel Width
+//   pointer.x = ((event.clientX - sidePanel.offsetWidth) / canvasContainer.offsetWidth) * 2 - 1;
+//   pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
+//   raycaster.setFromCamera(pointer, camera)
+//   const intersects = raycaster.intersectObjects(scene.children);
+//   // for (let i = 0; i < intersects.length; i++){
+//   //   intersects[i].object.material.color.set(0xff0000)
+//   // }
+//   if(intersects.length > 0){
+//     intersects[0].object.material.color.set(0xff0000)
+//     console.log(intersects[0].object)
+//   }
+// }
+// window.addEventListener('mousemove', onMouseMove);
+
+const raycaster = new THREE.Raycaster();
+const clickMouse = new THREE.Vector2();
+const moveMouse = new THREE.Vector2();
+var draggable = new THREE.Object3D();
+var holdingTile = false;
+
+//When Hold Mouse Clicker Down Check for draggable tile, if draggable grab object name.
+window.addEventListener('pointerdown', event => {
+  clickMouse.x = ((event.clientX - sidePanel.offsetWidth) / canvasContainer.offsetWidth) * 2 - 1;
+  clickMouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+  raycaster.setFromCamera( clickMouse, camera );
+  const found = raycaster.intersectObjects( scene.children );
+  if (found.length > 0 && found[0].object.userData.draggable){
+    draggable = found[0].object
+    holdingTile = true;
+    console.log(`found draggable ${draggable.userData.name}`)
+
+
+
+
+  }
+})
+
+// window.addEventListener('pointerdown', (event) => {
+//   // Cast a ray from where the mouse is pointing and
+//   // see if we hit something
+//   const hitPoint = getHitPoint(event.clientX, event.clientY, cubeMesh, camera)
+//   // Return if the cube wasn't hit
+//   if (!hitPoint) {
+//     return
+//   }
+//   // Move marker mesh on contact point
+//   showClickMarker()
+//   moveClickMarker(hitPoint)
+//   // Move the movement plane on the z-plane of the hit
+//   moveMovementPlane(hitPoint, camera)
+//   // Create the constraint between the cube body and the joint body
+//   addJointConstraint(hitPoint, cubeBody)
+//   // Set the flag to trigger pointermove on next frame so the
+//   // movementPlane has had time to move
+//   requestAnimationFrame(() => {
+//     isDragging = true
+//   })
+// })
+
+
+//When Release Mouse Clicker, show tile that's being dropped
+window.addEventListener('pointerup', event => {
+  if (holdingTile == true){
+    console.log(`dropping draggable ${draggable.userData.name}`)
+    holdingTile = false;
+    return;
+  }
+})
+
+//Move Objects
+window.addEventListener('mousemove', event => {
+    moveMouse.x = ((event.clientX - sidePanel.offsetWidth) / canvasContainer.offsetWidth) * 2 - 1;
+    moveMouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+})
+
+//Drag Object
+function dragObject() {
+  if (holdingTile == true){
+
+
+  }
+}
+
 
 //Cannon Debugger
 const cannonDebugger = new CannonDebugger(scene, physicsWorld,{
