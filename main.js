@@ -108,8 +108,7 @@ scene.add(clickMarker)
 
 // Movement plane when dragging
 const planeGeometry = new THREE.PlaneGeometry(100, 100)
-const floorMaterial = new THREE.MeshLambertMaterial({ color: 0xff0000 })
-
+const floorMaterial = new THREE.MeshBasicMaterial()
 let movementPlane = new THREE.Mesh(planeGeometry, floorMaterial)
 movementPlane.visible = true // Hide it..
 scene.add(movementPlane)
@@ -138,44 +137,55 @@ function createBlock(blockName, blockPosition, blockShape){
   scene.add(blockName)
   blockName.userData.draggable = true;
   blockVisualArray.push(blockName)//add the visual part of the block to the blockVisualArray list
+}
+
+//create tower Function - makes calls to createBlock()
+for(let i = 0; i <= 17; i++){ //use i <= 17 for 54 blocks
+  let blockLayer = i
+  let PosY = i*0.30 + .01 
+  if(blockLayer%2 == 0){
+    createBlock('block100', {X: 0, Y: PosY, Z: 0}, blockShape)
+    createBlock('block100', {X: 0, Y: PosY, Z: .50}, blockShape)
+    createBlock('block100', {X: 0, Y: PosY, Z: 1.00}, blockShape)
+  }
+  else{
+    createBlock('block100', {X: 0.50, Y: PosY, Z: .50}, blockShape2)
+    createBlock('block100', {X: 0, Y: PosY, Z: .50}, blockShape2)
+    createBlock('block100', {X: -.50, Y: PosY, Z: .50}, blockShape2)
+  }
+}
+
+//give all the tiles names in their THREE.userData
+for (let i = 1; i < scene.children.length; i++){
+  if (scene.children[i].userData.draggable == true){
+    scene.children[i].userData.name = 'tile'+ i
+  }
+}
+
+//Change all the CANNON.id for the block bodies to the same name as the THREE.userData.name 
+for (let i = 0; i < blockPhysicsArray.length; i++){
+  blockPhysicsArray[i].id = blockVisualArray[i].userData.name
+}
+
+//Return blockBody when from blockMesh 
+  function getBody(meshUserName){
+    let blockName = meshUserName.userData.name
+    let blockId = blockPhysicsArray.find(x=> x.id === blockName)
+    return blockId
   }
 
-  //create tower Function - makes calls to createBlock()
-  for(let i = 0; i <= 17; i++){ //use i <= 17 for 54 blocks
-    let blockLayer = i
-    let PosY = i*0.30 + .01 
-    if(blockLayer%2 == 0){
-      createBlock('block100', {X: 0, Y: PosY, Z: 0}, blockShape)
-      createBlock('block100', {X: 0, Y: PosY, Z: .50}, blockShape)
-      createBlock('block100', {X: 0, Y: PosY, Z: 1.00}, blockShape)
-    }
-    else{
-      createBlock('block100', {X: 0.50, Y: PosY, Z: .50}, blockShape2)
-      createBlock('block100', {X: 0, Y: PosY, Z: .50}, blockShape2)
-      createBlock('block100', {X: -.50, Y: PosY, Z: .50}, blockShape2)
-    }
-  }
-
-  //give all the tiles names in their userData
-  for (let i = 1; i < scene.children.length; i++){
-    if (scene.children[i].userData.draggable == true){
-      scene.children[i].userData.name = 'tile'+ i
-    }
-  }
-
-
-  // apply gravity gradually Here - Allows blocks to settle
-  const settleBLocks = gsap.timeline({})
-  settleBLocks.to(physicsWorld.gravity,{
-    duration: 5,
-    y: -0.1,
-    onComplete: () => { console.log(physicsWorld.gravity) }
-  });
-  settleBLocks.to(physicsWorld.gravity,{
-    duration: 10,
-    y: -9.8,
-    onComplete: () => { console.log(physicsWorld.gravity) }
-  });
+// apply gravity gradually Here - Allows blocks to settle
+const settleBLocks = gsap.timeline({})
+settleBLocks.to(physicsWorld.gravity,{
+  duration: 5,
+  y: -0.1,
+  onComplete: () => { console.log(physicsWorld.gravity) }
+});
+settleBLocks.to(physicsWorld.gravity,{
+  duration: 10,
+  y: -9.8,
+  onComplete: () => { console.log(physicsWorld.gravity) }
+});
 
   //Function to apply visual bodies to physics bodies - call from animate()
 function linkPhysics() {
@@ -213,8 +223,41 @@ function getHitPoint(clientX, clientY, mesh, camera) {
 }
 
 function moveMovementPlane(point, camera){
-  movementPlane.Position.copy(point)
-  movementPlane.quaternion.copy(point)
+  movementPlane.position.copy(point)
+  movementPlane.quaternion.copy(camera.quaternion)
+}
+
+//Get Center Point for PointToPointConstaint Function
+function getCenterPoint(mesh) {
+  var geometry = mesh.geometry;
+  geometry.computeBoundingBox();
+  var center = new THREE.Vector3();
+  geometry.boundingBox.getCenter( center );
+  mesh.localToWorld( center );
+  return center;
+}
+
+// Joint body, to later constraint the cube
+let jointBody
+const jointShape = new CANNON.Sphere(0.1)
+jointBody = new CANNON.Body({ mass: 0 })
+jointBody.addShape(jointShape)
+jointBody.collisionFilterGroup = 0
+jointBody.collisionFilterMask = 0
+physicsWorld.addBody(jointBody)
+
+//Joint Constraint Function Here - Must pass in a Cannon Object for constraineBody
+function addJointConstraint(position, constrainedBody) {  // Vector that goes from the body to the clicked point
+  const vector = new CANNON.Vec3().copy(position).vsub(constrainedBody.position)
+  // Apply anti-quaternion to vector to tranform it into the local body coordinate system
+  const antiRotation = constrainedBody.quaternion.inverse()
+  const pivot = antiRotation.vmult(vector) // pivot is not in local body coordinates
+  // Move the cannon click marker body to the click position
+  jointBody.position.copy(position)
+  // The pivot for the jointBody is zero  -  Create a new constraint
+  jointConstraint = new CANNON.PointToPointConstraint(constrainedBody, pivot, jointBody, new CANNON.Vec3(0, 0, 0))
+  // Add the constraint to physicsWorld
+  physicsWorld.addConstraint(jointConstraint)
 }
 
 //declare const for raycasting
@@ -225,23 +268,29 @@ var draggable = new THREE.Object3D();
 var holdingTile = false;
 
 //When Hold Mouse Clicker Down Check for draggable tile, if draggable grab object name.
+let currentBody
+let jointConstraint
 window.addEventListener('pointerdown', event => {
   clickMouse.x = ((event.clientX - sidePanel.offsetWidth) / canvasContainer.offsetWidth) * 2 - 1;
   clickMouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
   raycaster.setFromCamera( clickMouse, camera );
   const found = raycaster.intersectObjects( scene.children );
   if (found.length > 0 && found[0].object.userData.draggable){
     draggable = found[0].object
+    console.log(`picking draggable ${draggable.userData.name}`) // remove this console.log later
     holdingTile = true;
-    console.log(`found draggable ${draggable.userData.name}`)
-
     const hitPoint = getHitPoint(event.clientX, event.clientY, draggable, camera)
-    console.log(hitPoint)
     if (!hitPoint){ return }
     clickMarker.visible = true; //showClickMarker Function
     clickMarker.position.copy(hitPoint) //moveClickMarker Function
-    //moveMovement(point, camera)
+    moveMovementPlane(hitPoint, camera)
+    currentBody = getBody(draggable)
+    addJointConstraint(hitPoint, currentBody) //This function needs a Body
+
+
+
+
+////////////LEFT OFF HERE !!! FINISH THIS FIRST/////////////////////
 
 
   }
@@ -252,7 +301,8 @@ window.addEventListener('pointerdown', event => {
 //When Release Mouse Clicker, show tile that's being dropped
 window.addEventListener('pointerup', event => {
   if (holdingTile == true){
-    console.log(`dropping draggable ${draggable.userData.name}`)
+    console.log(`dropping draggable ${draggable.userData.name}`) // remove this console.log later
+    movementPlane.position.copy(0, 0, 0) //reposition movementPlane out of the way
     holdingTile = false;
     return;
   }
