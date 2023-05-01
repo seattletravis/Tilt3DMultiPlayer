@@ -36,8 +36,6 @@ physicsWorld.defaultContactMaterial.contactEquationRelaxationTime = 3
 //   {name: 'default', id: 0, friction: frict, restitution: rest},
 //   {name: 'default', id: 0, friction: frict, restitution: rest}
 // ]
-
-
 console.log(physicsWorld.defaultContactMaterial)
 
 //Window resize handler
@@ -82,8 +80,8 @@ let groundLength = 1
 const groundBody = new CANNON.Body({
   shape: new CANNON.Box(new CANNON.Vec3(groundWidth, groundLength, groundHeight)),
   type: CANNON.Body.STATIC, // infinite geometric plane
-  // linearDamping: .02,
-  // angularDamping: .02,
+  // linearDamping: 1,
+  // angularDamping: .5,
   sleepSpeedLimit: 10, //SLEEP SPEED LIMIT FOR TABLE
 }) 
 groundBody.position.set(0, -.40, .5)
@@ -100,7 +98,7 @@ groundVisualBody.quaternion.copy(groundBody.quaternion)
 
 
 // Click marker (Sphere) to be shown on interaction
-const markerGeometry = new THREE.SphereGeometry(0.1, 8, 8)
+const markerGeometry = new THREE.SphereGeometry(0.01, 8, 8)
 const markerMaterial = new THREE.MeshLambertMaterial({ color: 0xff0000 })
 let clickMarker = new THREE.Mesh(markerGeometry, markerMaterial)
 clickMarker.visible = false // Hide it..
@@ -110,7 +108,7 @@ scene.add(clickMarker)
 const planeGeometry = new THREE.PlaneGeometry(100, 100)
 const floorMaterial = new THREE.MeshBasicMaterial()
 let movementPlane = new THREE.Mesh(planeGeometry, floorMaterial)
-movementPlane.visible = true // Hide it..
+movementPlane.visible = false // Hide it..
 scene.add(movementPlane)
 
 // create block arrays
@@ -118,7 +116,7 @@ let blockShape = {W: 0.25, L: 0.75, H: 0.15};
 let blockShape2 = {W: 0.75, L: 0.25, H: 0.15};
 const blockPhysicsArray = [];
 const blockVisualArray = [];
-
+const slipperyMaterial = new CANNON.Material();
 //create block function
 function createBlock(blockName, blockPosition, blockShape){
   const mass = 0.00001;
@@ -126,6 +124,7 @@ function createBlock(blockName, blockPosition, blockShape){
       mass: mass,      
       shape: new CANNON.Box(new CANNON.Vec3(blockShape.L, blockShape.H, blockShape.W)),
       sleepSpeedLimit: .006, //SLEEP SPEED LIMIT FOR BLOCKS
+      material: slipperyMaterial,
     })
     blockName.position.set(blockPosition.X, blockPosition.Y, blockPosition.Z);
     physicsWorld.addBody(blockName)  
@@ -138,6 +137,14 @@ function createBlock(blockName, blockPosition, blockShape){
   blockName.userData.draggable = true;
   blockVisualArray.push(blockName)//add the visual part of the block to the blockVisualArray list
 }
+
+const blockToBlockContact = new CANNON.ContactMaterial(
+  slipperyMaterial,
+  slipperyMaterial,
+  {friction: 0.01}
+)
+
+physicsWorld.addContactMaterial(blockToBlockContact);
 
 //create tower Function - makes calls to createBlock()
 for(let i = 0; i <= 17; i++){ //use i <= 17 for 54 blocks
