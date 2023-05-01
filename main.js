@@ -205,7 +205,7 @@ function explodeTower() {
   }
 physicsWorld.defaultContactMaterial.contactEquationRelaxation = 0 //default = 3
 
-setTimeout( function() { location.reload() }, 3000 ) //reset tower
+setTimeout( function() { location.reload() }, 1000 ) //reset tower
 }
 //Turn Button On - ARMED
 explodeButton.addEventListener('click', function(){ //give Button functionality
@@ -222,6 +222,16 @@ function getHitPoint(clientX, clientY, mesh, camera) {
   return hits.length > 0 ? hits[0].point : undefined // Return the closest hit or undefined
 }
 
+//Control function - moveClickMarker
+function moveClickMarker(position) { clickMarker.position.copy(position) }
+
+//Control function - moveJoint
+function moveJoint(position){
+  jointBody.position.copy(position)
+  jointConstraint.update()
+}
+
+//Control function - moveMovementPlane
 function moveMovementPlane(point, camera){
   movementPlane.position.copy(point)
   movementPlane.quaternion.copy(camera.quaternion)
@@ -260,6 +270,11 @@ function addJointConstraint(position, constrainedBody) {  // Vector that goes fr
   physicsWorld.addConstraint(jointConstraint)
 }
 
+function removeJointConstraint(){
+  physicsWorld.removeConstraint(jointConstraint)
+  jointConstraint = undefined
+}
+
 //declare const for raycasting
 const raycaster = new THREE.Raycaster();
 const clickMouse = new THREE.Vector2();
@@ -270,6 +285,7 @@ var holdingTile = false;
 //When Hold Mouse Clicker Down Check for draggable tile, if draggable grab object name.
 let currentBody
 let jointConstraint
+let isDragging = false
 window.addEventListener('pointerdown', event => {
   clickMouse.x = ((event.clientX - sidePanel.offsetWidth) / canvasContainer.offsetWidth) * 2 - 1;
   clickMouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -282,20 +298,38 @@ window.addEventListener('pointerdown', event => {
     const hitPoint = getHitPoint(event.clientX, event.clientY, draggable, camera)
     if (!hitPoint){ return }
     clickMarker.visible = true; //showClickMarker Function
-    clickMarker.position.copy(hitPoint) //moveClickMarker Function
+    moveClickMarker(hitPoint) //moveClickMarker Function
     moveMovementPlane(hitPoint, camera)
     currentBody = getBody(draggable)
     addJointConstraint(hitPoint, currentBody) //This function needs a Body
-
-
-
-
-////////////LEFT OFF HERE !!! FINISH THIS FIRST/////////////////////
-
-
+    // Set the flag to trigger pointermove on next frame so the
+    // movementPlane has had time to move
+    requestAnimationFrame(() => {
+      isDragging = true
+    })
   }
 })
 
+//Mouse Movement Action
+window.addEventListener('pointermove', (event) => {
+  if (!isDragging) { return }
+  // Project the mouse onto the movement plane
+  const hitPoint = getHitPoint(event.clientX, event.clientY, movementPlane, camera)
+  if (hitPoint) {
+    // Move marker mesh on the contact point
+    moveClickMarker(hitPoint)
+    // Move the cannon constraint on the contact point
+    moveJoint(hitPoint)
+  }
+})
+
+//Pointerup clean up 
+window.addEventListener('pointerup', () => {
+  isDragging = false
+  clickMarker.visible = false; 
+  removeJointConstraint()
+
+})
 
 
 //When Release Mouse Clicker, show tile that's being dropped
