@@ -7,6 +7,7 @@ import * as THREE from 'three';
 // import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import * as CANNON from 'cannon-es';
 import CannonDebugger from 'cannon-es-debugger';
+import { space } from 'postcss/lib/list';
 
 gsap.registerPlugin(Flip, EaselPlugin, TextPlugin);
 
@@ -17,13 +18,35 @@ const sidePanel = document.querySelector('#sidePanel') // add sidePanel to the D
 
 //create physics engine - initialize CANNON
 const physicsWorld = new CANNON.World({
-  gravity: new CANNON.Vec3(0, 0, 0), //keeping gravity the same as earth!
+  gravity: new CANNON.Vec3(0, -0, 0), //Ramp Gravity up in Function
   // frictionGravity: new CANNON.Vec3(10, 10, 0),
 })
 
+// apply gravity gradually Here - Allows blocks to settle
+const settleBLocks = gsap.timeline({})
+let gravityMaxValue = -3
+settleBLocks.to(physicsWorld.gravity,{
+  duration: 5,
+  y: -.02,
+  onComplete: () => { console.log(physicsWorld.gravity) }
+});
+settleBLocks.to(physicsWorld.gravity,{
+  duration: 5,
+  y: gravityMaxValue,
+  onComplete: () => { console.log(physicsWorld.gravity) }
+});
+
+  //Function to apply visual bodies to physics bodies - call from animate()
+function linkPhysics() {
+  for (let i = 0; i < blockPhysicsArray.length; i++){
+    blockVisualArray[i].position.copy(blockPhysicsArray[i].position)
+    blockVisualArray[i].quaternion.copy(blockPhysicsArray[i].quaternion)
+  }
+}
+
 //ENVIRONMENTAL VARIABLES
 physicsWorld.allowSleep = true;
-// physicsWorld.defaultContactMaterial.contactEquationRelaxation = 3 //default = 3
+physicsWorld.defaultContactMaterial.contactEquationRelaxation = 3 //default = 3
 physicsWorld.defaultContactMaterial.contactEquationStiffness = 1e7 //default 10,000,000
 // physicsWorld.defaultContactMaterial.friction = .3 //default = 0.3
 // physicsWorld.defaultContactMaterial.frictionEquationRelaxation = 3 //default = 3
@@ -44,7 +67,7 @@ window.onresize = function(){
 }
 
 //create camera object
-const camera = new THREE.PerspectiveCamera( 39, canvasContainer.offsetWidth / canvasContainer.offsetHeight, 0.5, 1000 );
+const camera = new THREE.PerspectiveCamera( 50, canvasContainer.offsetWidth / canvasContainer.offsetHeight, 0.5, 1000 );
 camera.position.set(10, 10, -5)
 camera.lookAt(0, 3, 0)
 
@@ -66,6 +89,11 @@ renderer.shadowMap.enabled = true;
 const light = new THREE.AmbientLight( 0xFFFFFF, 0.5 );
 scene.add( light );
 
+//add nice background Image
+const spaceTexture = new THREE.TextureLoader().load('./tower_images/skybox/space2/corona_dn.png')
+scene.background = spaceTexture
+
+
 //add sun light source
 // const sunlight = new THREE.PointLight( 0xFFFFFF, 2, 10000)
 // sunlight.castShadow = true;
@@ -80,8 +108,6 @@ let groundLength = 1
 const groundBody = new CANNON.Body({
   shape: new CANNON.Box(new CANNON.Vec3(groundWidth, groundLength, groundHeight)),
   type: CANNON.Body.STATIC, // infinite geometric plane
-  // linearDamping: 1,
-  // angularDamping: .5,
   sleepSpeedLimit: 10, //SLEEP SPEED LIMIT FOR TABLE
 }) 
 groundBody.position.set(0, -.40, .5)
@@ -106,7 +132,7 @@ scene.add(clickMarker)
 
 // Movement plane when dragging
 const planeGeometry = new THREE.PlaneGeometry(100, 100)
-const floorMaterial = new THREE.MeshBasicMaterial()
+const floorMaterial = new THREE.MeshStandardMaterial()
 let movementPlane = new THREE.Mesh(planeGeometry, floorMaterial)
 movementPlane.visible = false // Hide it..
 scene.add(movementPlane)
@@ -117,6 +143,7 @@ let blockShape2 = {W: 0.75, L: 0.25, H: 0.15};
 const blockPhysicsArray = [];
 const blockVisualArray = [];
 const slipperyMaterial = new CANNON.Material();
+const woodTexture = new THREE.TextureLoader().load('./tower_images/wood.jpg')
 //create block function
 function createBlock(blockName, blockPosition, blockShape){
   const mass = 0.00001;
@@ -131,7 +158,10 @@ function createBlock(blockName, blockPosition, blockShape){
     blockPhysicsArray.push(blockName)//add the blocks to List blockPhysicsArray
     blockName = new THREE.Mesh( //visual part of block
     new THREE.BoxGeometry(blockShape.L*2, blockShape.H*2, blockShape.W*2),
-    new THREE.MeshPhongMaterial({ color: 0xfafafa}),
+    new THREE.MeshStandardMaterial({
+      map: woodTexture
+    }),
+    
   );
   scene.add(blockName)
   blockName.userData.draggable = true;
@@ -152,13 +182,13 @@ for(let i = 0; i <= 17; i++){ //use i <= 17 for 54 blocks
   let PosY = i*0.30 + .01 
   if(blockLayer%2 == 0){
     createBlock('block100', {X: 0, Y: PosY, Z: 0}, blockShape)
-    createBlock('block100', {X: 0, Y: PosY, Z: .50}, blockShape)
-    createBlock('block100', {X: 0, Y: PosY, Z: 1.00}, blockShape)
+    createBlock('block100', {X: 0, Y: PosY, Z: .505}, blockShape)
+    createBlock('block100', {X: 0, Y: PosY, Z: 1.01}, blockShape)
   }
   else{
-    createBlock('block100', {X: 0.50, Y: PosY, Z: .50}, blockShape2)
+    createBlock('block100', {X: 0.51, Y: PosY, Z: .50}, blockShape2)
     createBlock('block100', {X: 0, Y: PosY, Z: .50}, blockShape2)
-    createBlock('block100', {X: -.50, Y: PosY, Z: .50}, blockShape2)
+    createBlock('block100', {X: -.51, Y: PosY, Z: .50}, blockShape2)
   }
 }
 
@@ -181,26 +211,7 @@ for (let i = 0; i < blockPhysicsArray.length; i++){
     return blockId
   }
 
-// apply gravity gradually Here - Allows blocks to settle
-const settleBLocks = gsap.timeline({})
-settleBLocks.to(physicsWorld.gravity,{
-  duration: 5,
-  y: -0.1,
-  onComplete: () => { console.log(physicsWorld.gravity) }
-});
-settleBLocks.to(physicsWorld.gravity,{
-  duration: 10,
-  y: -9.8,
-  onComplete: () => { console.log(physicsWorld.gravity) }
-});
 
-  //Function to apply visual bodies to physics bodies - call from animate()
-function linkPhysics() {
-  for (let i = 0; i < blockPhysicsArray.length; i++){
-    blockVisualArray[i].position.copy(blockPhysicsArray[i].position)
-    blockVisualArray[i].quaternion.copy(blockPhysicsArray[i].quaternion)
-  }
-}
 
 //Grab button1 from html
 const explodeButton = document.getElementById('button1')
@@ -300,6 +311,8 @@ window.addEventListener('pointerdown', event => {
   const found = raycaster.intersectObjects( scene.children );
   if (found.length > 0 && found[0].object.userData.draggable){
     draggable = found[0].object
+    physicsWorld.gravity.set(0, -1, 0)
+    console.log(physicsWorld.gravity)
     console.log(`picking draggable ${draggable.userData.name}`) // remove this console.log later
     holdingTile = true;
     const hitPoint = getHitPoint(event.clientX, event.clientY, draggable, camera)
@@ -345,6 +358,11 @@ window.addEventListener('pointerup', event => {
     console.log(`dropping draggable ${draggable.userData.name}`) // remove this console.log later
     movementPlane.position.copy(0, 0, 0) //reposition movementPlane out of the way
     holdingTile = false;
+    gsap.to(physicsWorld.gravity, {
+      duration:3,
+      y: gravityMaxValue,
+      onComplete: () => { console.log(physicsWorld.gravity) }
+    })
     return;
   }
 })
@@ -365,14 +383,14 @@ function dragObject() {
 
 
 //Cannon Debugger
-const cannonDebugger = new CannonDebugger(scene, physicsWorld,{
-})
+// const cannonDebugger = new CannonDebugger(scene, physicsWorld,{
+// })
 
 //ANIMATION FUNCTION
 function animate() {
   requestAnimationFrame( animate );
   physicsWorld.fixedStep()
-  cannonDebugger.update()
+  // cannonDebugger.update()
   linkPhysics()
  
 
