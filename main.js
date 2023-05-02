@@ -19,41 +19,40 @@ const sidePanel = document.querySelector('#sidePanel') // add sidePanel to the D
 
 //create physics engine - initialize CANNON
 const physicsWorld = new CANNON.World({
-  gravity: new CANNON.Vec3(0, -0, 0), //Ramp Gravity up in Function
-  // frictionGravity: new CANNON.Vec3(10, 10, 0),
+  gravity: new CANNON.Vec3(0, 0, -0.013), //Ramp Gravity up in Function
 })
 
 const gameStatus1 = document.getElementById('gameStatus1')
 const gameStatus2 = document.getElementById('gameStatus2')
 
 // apply gravity gradually Here - Allows blocks to settle
-const settleBLocks = gsap.timeline({})
-let gravityMaxValue = -4
-settleBLocks.to(physicsWorld.gravity,{
+let gamePlayOff = true //flag to disable gameplay until gravity is initalized
+const gravityRamp = gsap.timeline({})
+let gravityMaxValue = -3
+gravityRamp.to(physicsWorld.gravity,{
   duration: 2,
-  y: -.02,
+  y: -.01,
   onComplete: () => { 
     gameStatus1.className = "text-yellow-500 px-8"
     gameStatus2.className = "text-yellow-500 px-8"
-    gameStatus1.innerText = 'STATUS: 5, 4, 3 ....'
+    gameStatus1.innerText = 'STATUS: SET!'
     gameStatus2.innerText = 'GAME IMMINENT'
+    zeroBlockVelocities()
   }
 });
-settleBLocks.to(physicsWorld.gravity,{
+gravityRamp.to(physicsWorld.gravity,{
   duration: 4,
   y: gravityMaxValue,
   onComplete: () => { 
     physicsWorld.allowSleep = false
     gameStatus1.className = "text-green-600 px-8"
     gameStatus2.className = "text-green-600 px-8"
-    gameStatus1.innerText = 'STATUS: READY'
+    gameStatus1.innerText = 'STATUS: GO!'
     gameStatus2.innerText = 'LETS PLAY!!!'
-    startGame()
-    console.log('Happening Now')
+    zeroBlockVelocities()
+    gamePlayOff = false
    }
 });
-
-
 
   //Function to apply visual bodies to physics bodies - call from animate()
 function linkPhysics() {
@@ -143,7 +142,7 @@ groundVisualBody.quaternion.copy(groundBody.quaternion)
 
 
 // Click marker (Sphere) to be shown on interaction
-const markerGeometry = new THREE.SphereGeometry(0.01, 8, 8)
+const markerGeometry = new THREE.SphereGeometry(0.08, 8, 8)
 const markerMaterial = new THREE.MeshLambertMaterial({ color: 0xff0000 })
 let clickMarker = new THREE.Mesh(markerGeometry, markerMaterial)
 clickMarker.visible = false // Hide it..
@@ -209,6 +208,7 @@ for(let i = 0; i <= 17; i++){ //use i <= 17 for 54 blocks
     createBlock('block100', {X: 0, Y: PosY, Z: .50}, blockShape2)
     createBlock('block100', {X: -.51, Y: PosY, Z: .50}, blockShape2)
   }
+  zeroBlockVelocities()
 }
 
 //give all the tiles names in their THREE.userData
@@ -224,24 +224,30 @@ for (let i = 0; i < blockPhysicsArray.length; i++){
 }
 
 //Return blockBody when from blockMesh 
-  function getBody(meshUserName){
-    let blockName = meshUserName.userData.name
-    let blockId = blockPhysicsArray.find(x=> x.id === blockName)
-    return blockId
-  }
+function getBody(meshUserName){
+  let blockName = meshUserName.userData.name
+  let blockId = blockPhysicsArray.find(x=> x.id === blockName)
+  return blockId
+}
 
-  let sleepState = true
-  function wakeUpBlocks(){
-    for (let i = 0; i < blockPhysicsArray.length; i++){
-      if(i > 44){    
-        blockPhysicsArray[i].applyImpulse(new CANNON.Vec3(0, .000001, 0), new CANNON.Vec3(0, 0, 0));
-      }
+let sleepState = true
+function wakeUpBlocks(){
+  for (let i = 0; i < blockPhysicsArray.length; i++){
+    if(i > 44){    
+      blockPhysicsArray[i].applyImpulse(new CANNON.Vec3(0, .000001, 0), new CANNON.Vec3(0, 0, 0));
     }
-    sleepState = false
   }
+}
+
+function zeroBlockVelocities(){
+  for (let i = 0; i < blockPhysicsArray.length; i++){  
+      blockPhysicsArray[i].velocity.set(0,0,0)
+  }
+}
+
+
 
 //resets tower 
-
 const resetButton = document.getElementById('button1') //Grab button1 from html
 function resetTower() {
   gsap.killTweensOf(physicsWorld.gravity)
@@ -257,7 +263,7 @@ function resetTower() {
     let randoY = (Math.random()) * .0002
     blockPhysicsArray[i].applyImpulse(new CANNON.Vec3(randoX, randoY, randoZ), new CANNON.Vec3(0, 0, 0));
   }
-setTimeout( function() { location.reload() }, 4000 ) //reset tower - 4 seconds to watch animation. 
+setTimeout( function() { location.reload() }, 2000 ) //reset tower - 2 seconds to watch animation. 
 }
 resetButton.addEventListener('click', function(){ //give Button functionality - BUTTON ARMED
   resetTower()
@@ -338,14 +344,13 @@ let jointConstraint
 let currentBody
 let isDragging = false
 // Initialize & allow gameplay after tiles have settled down
-function startGame() {
+
 window.addEventListener('pointerdown', event => {
-  
   clickMouse.x = ((event.clientX - sidePanel.offsetWidth) / canvasContainer.offsetWidth) * 2 - 1;
   clickMouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
   raycaster.setFromCamera( clickMouse, camera );
   const found = raycaster.intersectObjects( scene.children );
-  if (found.length > 0 && found[0].object.userData.draggable){
+  if (found.length > 0 && found[0].object.userData.draggable && !gamePlayOff){
     if(sleepState == true){ wakeUpBlocks() }
     draggable = found[0].object
     physicsWorld.gravity.set(0, -1, 0)
@@ -391,7 +396,7 @@ window.addEventListener('pointerdown', event => {
       return;
     }
   })
-}
+
 
 
 //Move Objects
