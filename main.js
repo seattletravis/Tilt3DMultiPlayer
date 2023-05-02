@@ -16,7 +16,7 @@ const scene = new THREE.Scene();
 const canvasContainer = document.querySelector('#canvasContainer') //Grab canvas Container from document
 const sidePanel = document.querySelector('#sidePanel') // add sidePanel to the DOM
 
-let gravityMaxValue = -4
+let gravityMaxValue = -3
 //create physics engine - initialize CANNON
 const physicsWorld = new CANNON.World({
   gravity: new CANNON.Vec3(0, gravityMaxValue, 0), //Ramp Gravity up in Function
