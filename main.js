@@ -4,7 +4,6 @@ import { Flip } from "gsap/Flip";
 import { EaselPlugin } from "gsap/EaselPlugin";
 import { TextPlugin } from "gsap/TextPlugin";
 import * as THREE from 'three';
-// import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import * as CANNON from 'cannon-es';
 // import CannonDebugger from 'cannon-es-debugger';
 // import { space } from 'postcss/lib/list';
@@ -17,42 +16,14 @@ const scene = new THREE.Scene();
 const canvasContainer = document.querySelector('#canvasContainer') //Grab canvas Container from document
 const sidePanel = document.querySelector('#sidePanel') // add sidePanel to the DOM
 
+let gravityMaxValue = -4
 //create physics engine - initialize CANNON
 const physicsWorld = new CANNON.World({
-  gravity: new CANNON.Vec3(0, 0, -0.013), //Ramp Gravity up in Function
+  gravity: new CANNON.Vec3(0, gravityMaxValue, 0), //Ramp Gravity up in Function
 })
 
-const gameStatus1 = document.getElementById('gameStatus1')
-const gameStatus2 = document.getElementById('gameStatus2')
-
-// apply gravity gradually Here - Allows blocks to settle
-let gamePlayOff = true //flag to disable gameplay until gravity is initalized
-const gravityRamp = gsap.timeline({})
-let gravityMaxValue = -3
-gravityRamp.to(physicsWorld.gravity,{
-  duration: 2,
-  y: -.01,
-  onComplete: () => { 
-    gameStatus1.className = "text-yellow-500 px-8"
-    gameStatus2.className = "text-yellow-500 px-8"
-    gameStatus1.innerText = 'STATUS: SET!'
-    gameStatus2.innerText = 'GAME IMMINENT'
-    zeroBlockVelocities()
-  }
-});
-gravityRamp.to(physicsWorld.gravity,{
-  duration: 4,
-  y: gravityMaxValue,
-  onComplete: () => { 
-    physicsWorld.allowSleep = false
-    gameStatus1.className = "text-green-600 px-8"
-    gameStatus2.className = "text-green-600 px-8"
-    gameStatus1.innerText = 'STATUS: GO!'
-    gameStatus2.innerText = 'LETS PLAY!!!'
-    zeroBlockVelocities()
-    gamePlayOff = false
-   }
-});
+// const gameStatus1 = document.getElementById('gameStatus1')
+// const gameStatus2 = document.getElementById('gameStatus2')
 
   //Function to apply visual bodies to physics bodies - call from animate()
 function linkPhysics() {
@@ -72,7 +43,6 @@ physicsWorld.defaultContactMaterial.contactEquationStiffness = 1e7 //default 10,
 physicsWorld.defaultContactMaterial.contactEquationRelaxationTime = 3
 // let frict = 10
 // let rest = 0
-
 // physicsWorld.defaultContactMaterial.materials = [
 //   {name: 'default', id: 0, friction: frict, restitution: rest},
 //   {name: 'default', id: 0, friction: frict, restitution: rest}
@@ -169,6 +139,7 @@ function createBlock(blockName, blockPosition, blockShape){
       mass: mass,      
       shape: new CANNON.Box(new CANNON.Vec3(blockShape.L, blockShape.H, blockShape.W)),
       // sleepSpeedLimit: .006, //SLEEP SPEED LIMIT FOR BLOCKS
+      angularDamping: .99,
       material: slipperyMaterial,
     })
     blockName.position.set(blockPosition.X, blockPosition.Y, blockPosition.Z);
@@ -208,7 +179,6 @@ for(let i = 0; i <= 17; i++){ //use i <= 17 for 54 blocks
     createBlock('block100', {X: 0, Y: PosY, Z: .50}, blockShape2)
     createBlock('block100', {X: -.51, Y: PosY, Z: .50}, blockShape2)
   }
-  zeroBlockVelocities()
 }
 
 //give all the tiles names in their THREE.userData
@@ -230,22 +200,21 @@ function getBody(meshUserName){
   return blockId
 }
 
-let sleepState = true
-function wakeUpBlocks(){
-  for (let i = 0; i < blockPhysicsArray.length; i++){
-    if(i > 44){    
-      blockPhysicsArray[i].applyImpulse(new CANNON.Vec3(0, .000001, 0), new CANNON.Vec3(0, 0, 0));
-    }
-  }
-}
 
-function zeroBlockVelocities(){
+// function wakeUpBlocks(){
+//   for (let i = 0; i < blockPhysicsArray.length; i++){
+//     if(i > 44){    
+//       blockPhysicsArray[i].applyImpulse(new CANNON.Vec3(0, .0000001, 0), new CANNON.Vec3(0, 0, 0));
+//     }
+//   }
+//   physicsWorld.allowSleep = false
+// }
+
+function zeroOutVelocities(){
   for (let i = 0; i < blockPhysicsArray.length; i++){  
       blockPhysicsArray[i].velocity.set(0,0,0)
   }
 }
-
-
 
 //resets tower 
 const resetButton = document.getElementById('button1') //Grab button1 from html
@@ -350,8 +319,9 @@ window.addEventListener('pointerdown', event => {
   clickMouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
   raycaster.setFromCamera( clickMouse, camera );
   const found = raycaster.intersectObjects( scene.children );
-  if (found.length > 0 && found[0].object.userData.draggable && !gamePlayOff){
-    if(sleepState == true){ wakeUpBlocks() }
+  if (found.length > 0 && found[0].object.userData.draggable){
+    // if(physicsWorld.allowSleep == true){ wakeUpBlocks() }
+    // wakeUpBlocks()
     draggable = found[0].object
     physicsWorld.gravity.set(0, -1, 0)
     holdingTile = true;
@@ -385,27 +355,20 @@ window.addEventListener('pointerdown', event => {
   window.addEventListener('pointerup', event => {
     isDragging = false
     clickMarker.visible = false; 
+    physicsWorld.gravity.y = gravityMaxValue
     removeJointConstraint()
     if (holdingTile == true){
       movementPlane.position.copy(0, 0, 0) //reposition movementPlane out of the way
       holdingTile = false;
-      gsap.to(physicsWorld.gravity, {
-        duration:3,
-        y: gravityMaxValue,
-      })
       return;
     }
   })
-
-
 
 //Move Objects
 window.addEventListener('mousemove', event => {
     moveMouse.x = ((event.clientX - sidePanel.offsetWidth) / canvasContainer.offsetWidth) * 2 - 1;
     moveMouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 })
-
-
 
 //Cannon Debugger
 // const cannonDebugger = new CannonDebugger(scene, physicsWorld,{
