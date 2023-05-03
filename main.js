@@ -68,11 +68,16 @@ const buttonRight = document.getElementById('buttonRight')
 let radialDistance = camera.position.x
 let cameraAngle = 0
 
+function buttonNormalState(){
+
+}
+
 //Move Camera Up
 repeatWhileMouseOver(buttonUp, moveCameraUp, 50)
 function moveCameraUp() {
   camera.position.y -=.05
   camera.lookAt(0, camera.position.y, 0)
+  buttonUp.className = 'text-green-600 bg-blue-600 inline-block py-1 rounded-full px-8'
 }
 
 //Move Camera Down
@@ -80,6 +85,7 @@ repeatWhileMouseOver(buttonDown, moveCameraDown, 50)
 function moveCameraDown() {
   camera.position.y += 0.05
   camera.lookAt(0, camera.position.y, 0)
+  buttonDown.className = 'text-green-600 bg-blue-600 inline-block px-4 py-1 rounded-full px-4'
 }
 
 //Move Camera Left
@@ -90,6 +96,7 @@ function moveCameraLeft() {
   camera.position.x = radialDistance * Math.cos(cameraAngle)
   camera.position.z = radialDistance * Math.sin(cameraAngle)
   camera.lookAt(0, camera.position.y, 0)
+  buttonLeft.className = 'text-green-600 bg-blue-600 inline-block px-4 py-1 rounded-full px-6'
 }
 
 //Move Camera Right
@@ -99,6 +106,7 @@ function moveCameraRight() {
   camera.position.x = radialDistance * Math.cos(cameraAngle)
   camera.position.z = radialDistance * Math.sin(cameraAngle)
   camera.lookAt(0, camera.position.y, 0)
+  buttonRight.className = 'text-green-600 bg-blue-600 inline-block px-4 py-1 rounded-full px-4'
 }
 
 //Hover Controls for Camera Controls
@@ -109,6 +117,10 @@ function repeatWhileMouseOver(element, action, milliseconds) {
   });
 
   element.addEventListener('mouseout', function () {
+    buttonDown.className = 'text-green-600 bg-white inline-block py-1 rounded-full px-4'
+    buttonLeft.className = 'text-green-600 bg-white inline-block py-1 rounded-full px-6'
+    buttonRight.className = 'text-green-600 bg-white inline-block py-1 rounded-full px-4'
+    buttonUp.className = 'text-green-600 bg-white inline-block py-1 rounded-full px-8'
       clearInterval(interval);
   });
 }
