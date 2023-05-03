@@ -269,14 +269,15 @@ function getBody(meshUserName){
   return blockId
 }
 
-
-function wakeUpBlocks(){
+//Block stay asleep until nudged - results in a bug. KEEP WORKING ON THIS BUG
+function wakeUpBlocks(){ 
   for (let i = 0; i < blockPhysicsArray.length; i++){
     if(i > 44){ 
       physicsWorld.allowSleep = false
       blockPhysicsArray[i].speepSpeedLimit = 0   
-      blockPhysicsArray[i].sleepState = 0
-      console.log(blockPhysicsArray[i])
+      blockPhysicsArray[i].sleepState = 1
+      // console.log(blockPhysicsArray[i])
+      // console.log(physicsWorld.allowSleep)
     }
   }
 }
