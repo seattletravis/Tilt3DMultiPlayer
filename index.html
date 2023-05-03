@@ -7,10 +7,12 @@
     <title>BLOCKS IN SPACE</title>
   </head>
   <body>
-    <div class="flex h-screen bg-black">
-      <div id="sidePanel" class="w-1/4 flex flex-col justify-center px-8">
+    <div class="flex h-screen bg-black select-none">
+      <div id="sidePanel" class="w-1/2 flex flex-col justify-center px-8">
           <h1 class="text-center text-white px-4 text-2xl">TRAVIS.LAMBERTE.COM</h1> <br>
-            <a title="Return to Game Menu!" id="enterButton" class="text-green-600 bg-white font-bold text-center border-2 border-green-600 inline-block text-2xl px-4 rounded-full" href="../arcade/index.html">ENTER</a> <br>
+            <a title="Return to Game Menu!" id="enterButton" 
+            class="text-green-600 bg-white font-bold text-center border-2 border-green-600 inline-block text-2xl px-4 rounded-full" 
+            href="../arcade/index.html">ENTER</a> <br>
           <h1 class="text-center text-white px-8 text-2xl">& HIRE ME TODAY</h1>
           <br><br>
 
@@ -21,7 +23,12 @@
               <H2 class="text-white px-8">Rotate Up-Down: </H2>
               <br>
               <div class="px-8">
-                  <button id="button2" class="text-green-600 bg-white inline-block px-4 py-1 rounded-full">CONTROLS HERE</button>
+                <button id="buttonUp" class=" text-green-600 bg-white inline-block px-4 py-1 rounded-full">UP</button>
+                <div>
+                  <button id="buttonLeft" class="text-green-600 bg-white px-4 py-1 rounded-full">LEFT</button>
+                  <button id="buttonRight" class="text-green-600 bg-white px-4 py-1 rounded-full">RIGHT</button>
+                </div>
+                <button id="buttonDown" class="text-green-600 bg-white inline-block px-4 py-1 rounded-full">DOWN</button>
               </div>
               <br>
               <H1 class="text-white px-8">Rotate Left - Right:</H1>
@@ -31,8 +38,8 @@
               </div>
               <br><br>
               <div class="border-2 rounded-lg">
-                  <H1 id="gameStatus1" class="text-red-500 px-8">STATUS: READY!</H1>
-                  <H1 id="gameStatus2" class="text-red-500 px-8">PREPARING TILES</H1> 
+                  <H1 id="gameStatus1" class="text-green-600 px-8">LETS PLAY!</H1>
+                  <H1 id="gameStatus2" class="text-green-600 px-8">3D PROJECT IN JAVASCRIPT</H1> 
               </div>
           </div>
       </div>
