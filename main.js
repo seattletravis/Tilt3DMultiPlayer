@@ -34,7 +34,7 @@ function linkPhysics() {
 }
 
 //ENVIRONMENTAL VARIABLES
-physicsWorld.allowSleep = true;
+// physicsWorld.allowSleep = true;
 // physicsWorld.defaultContactMaterial.contactEquationRelaxation = 3 //default = 3
 physicsWorld.defaultContactMaterial.contactEquationStiffness = 1e7 //default 10,000,000
 // physicsWorld.defaultContactMaterial.friction = .3 //default = 0.3
@@ -54,10 +54,70 @@ window.onresize = function(){
     resetTower()
 }
 
+
 //create camera object
 const camera = new THREE.PerspectiveCamera( 50, canvasContainer.offsetWidth / canvasContainer.offsetHeight, 0.5, 1000 );
-camera.position.set(10, 2, 0)
-camera.lookAt(0, 2, 0)
+camera.position.set(10, 3, 0)
+camera.lookAt(0, 3, 0)
+
+//Grab the Camera Buttons
+const buttonLeft = document.getElementById('buttonLeft')
+const buttonUp = document.getElementById('buttonUp')
+const buttonDown = document.getElementById('buttonDown')
+const buttonRight = document.getElementById('buttonRight')
+let radialDistance = camera.position.x
+let cameraAngle = 0
+
+//Move Camera Up
+repeatWhileMouseOver(buttonUp, moveCameraUp, 50)
+function moveCameraUp() {
+  camera.position.y -=.05
+  camera.lookAt(0, camera.position.y, 0)
+}
+
+//Move Camera Down
+repeatWhileMouseOver(buttonDown, moveCameraDown, 50)
+function moveCameraDown() {
+  camera.position.y += 0.05
+  camera.lookAt(0, camera.position.y, 0)
+}
+
+//Move Camera Left
+repeatWhileMouseOver(buttonLeft, moveCameraLeft, 20)
+function moveCameraLeft() {
+  cameraAngle += Math.PI/180
+  // camera.position.y = cameraPosY
+  camera.position.x = radialDistance * Math.cos(cameraAngle)
+  camera.position.z = radialDistance * Math.sin(cameraAngle)
+  camera.lookAt(0, camera.position.y, 0)
+}
+
+//Move Camera Right
+repeatWhileMouseOver(buttonRight, moveCameraRight, 20)
+function moveCameraRight() {
+  cameraAngle -= Math.PI/180
+  camera.position.x = radialDistance * Math.cos(cameraAngle)
+  camera.position.z = radialDistance * Math.sin(cameraAngle)
+  camera.lookAt(0, camera.position.y, 0)
+}
+
+//Hover Controls for Camera Controls
+function repeatWhileMouseOver(element, action, milliseconds) {
+  var interval = null;
+  element.addEventListener('mouseover', function () {
+      interval = setInterval(action, milliseconds);
+  });
+
+  element.addEventListener('mouseout', function () {
+      clearInterval(interval);
+  });
+}
+
+
+
+//////////CURRENTLY WORKING HERE //////////
+
+
 
 //create renderer
 const renderer = new THREE.WebGLRenderer(
@@ -92,6 +152,7 @@ scene.background = spaceTexture
 let groundWidth = 1
 let groundHeight = 0.25
 let groundLength = 1
+const tableTexture = new THREE.TextureLoader().load('./tower_images/wood.jpg')
 
 const groundBody = new CANNON.Body({
   shape: new CANNON.Box(new CANNON.Vec3(groundWidth, groundLength, groundHeight)),
@@ -103,7 +164,10 @@ groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0); //rotate groundBody 90 d
 physicsWorld.addBody(groundBody);
 const groundVisualBody = new THREE.Mesh( //visual part of ground
   new THREE.BoxGeometry(groundWidth*2, groundLength*2, groundHeight*2),
-  new THREE.MeshNormalMaterial()
+  // new THREE.MeshNormalMaterial()
+  new THREE.MeshStandardMaterial({
+    map: tableTexture
+  }),
 )
 scene.add(groundVisualBody)
 groundVisualBody.userData.ground = true;
@@ -132,6 +196,7 @@ const blockPhysicsArray = [];
 const blockVisualArray = [];
 const slipperyMaterial = new CANNON.Material();
 const woodTexture = new THREE.TextureLoader().load('./tower_images/wood.jpg')
+
 //create block function
 function createBlock(blockName, blockPosition, blockShape){
   const mass = 0.00001;
@@ -139,7 +204,7 @@ function createBlock(blockName, blockPosition, blockShape){
       mass: mass,      
       shape: new CANNON.Box(new CANNON.Vec3(blockShape.L, blockShape.H, blockShape.W)),
       // sleepSpeedLimit: .006, //SLEEP SPEED LIMIT FOR BLOCKS
-      angularDamping: .99,
+      angularDamping: .99999,
       material: slipperyMaterial,
     })
     blockName.position.set(blockPosition.X, blockPosition.Y, blockPosition.Z);
