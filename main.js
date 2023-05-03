@@ -54,7 +54,6 @@ window.onresize = function(){
     resetTower()
 }
 
-
 //create camera object
 const camera = new THREE.PerspectiveCamera( 50, canvasContainer.offsetWidth / canvasContainer.offsetHeight, 0.5, 1000 );
 camera.position.set(10, 3, 0)
@@ -70,15 +69,12 @@ const buttonOut = document.getElementById('buttonOut')
 let radialDistance = camera.position.x
 let cameraAngle = 0
 
-function buttonNormalState(){
-}
-
 //Move Camera Up
 repeatWhileMouseOver(buttonUp, moveCameraUp, 5)
 function moveCameraUp() {
   camera.position.y -=.005
   camera.lookAt(0, camera.position.y, 0)
-  buttonUp.className = 'text-green-600 bg-blue-600 inline-block py-1 rounded-full px-8'
+  buttonUp.className = 'text-green-600 border-4 border-green-600  bg-blue-600 inline-block py-1 rounded-full px-8'
 }
 
 //Move Camera Down
@@ -86,7 +82,7 @@ repeatWhileMouseOver(buttonDown, moveCameraDown, 5)
 function moveCameraDown() {
   camera.position.y += 0.005
   camera.lookAt(0, camera.position.y, 0)
-  buttonDown.className = 'text-green-600 bg-blue-600 inline-block px-4 py-1 rounded-full px-4'
+  buttonDown.className = 'text-green-600 border-4 border-green-600  bg-blue-600 inline-block px-4 py-1 rounded-full px-4'
 }
 
 //Move Camera Left
@@ -97,7 +93,7 @@ function moveCameraLeft() {
   camera.position.x = radialDistance * Math.cos(cameraAngle)
   camera.position.z = radialDistance * Math.sin(cameraAngle)
   camera.lookAt(0, camera.position.y, 0)
-  buttonLeft.className = 'text-green-600 bg-blue-600 inline-block px-4 py-1 rounded-full px-6'
+  buttonLeft.className = 'text-green-600 border-4 border-green-600  bg-blue-600 inline-block px-4 py-1 rounded-full px-6'
 }
 
 //Move Camera Right
@@ -107,7 +103,7 @@ function moveCameraRight() {
   camera.position.x = radialDistance * Math.cos(cameraAngle)
   camera.position.z = radialDistance * Math.sin(cameraAngle)
   camera.lookAt(0, camera.position.y, 0)
-  buttonRight.className = 'text-green-600 bg-blue-600 inline-block px-4 py-1 rounded-full px-4'
+  buttonRight.className = 'text-green-600 border-4 border-green-600  bg-blue-600 inline-block px-4 py-1 rounded-full px-4'
 }
 
 //Zoom Camera In
@@ -117,7 +113,7 @@ function moveCameraIn() {
   radialDistance -= 0.02
   camera.position.x = radialDistance * Math.cos(cameraAngle)
   camera.position.z = radialDistance * Math.sin(cameraAngle)
-  buttonIn.className = 'text-green-600 bg-blue-600 inline-block py-1 rounded-full px-8'
+  buttonIn.className = 'text-green-600 border-4 border-green-600  bg-blue-600 inline-block py-1 rounded-full px-8'
 }
 
 //Zoom Camera Out
@@ -126,16 +122,16 @@ function moveCameraOut() {
   radialDistance += 0.02
   camera.position.x = radialDistance * Math.cos(cameraAngle)
   camera.position.z = radialDistance * Math.sin(cameraAngle)
-  buttonOut.className = 'text-green-600 bg-blue-600 inline-block py-1 rounded-full px-8'
+  buttonOut.className = 'text-green-600 border-4 border-green-600  bg-blue-600 inline-block py-1 rounded-full px-8'
 }
 
 //load state for buttons
-const btnDown = 'text-green-600 bg-yellow-400 inline-block py-1 rounded-full px-4'
-const btnLeft = 'text-green-600 bg-yellow-400 inline-block py-1 rounded-full px-6'
-const btnRight = 'text-green-600 bg-yellow-400 inline-block py-1 rounded-full px-4'
-const btnUp = 'text-green-600 bg-yellow-400 inline-block py-1 rounded-full px-8'
-const btnIn = 'text-green-600 bg-yellow-400 inline-block py-1 rounded-full px-8'
-const btnOut = 'text-green-600 bg-yellow-400 inline-block py-1 rounded-full px-8'
+const btnDown = 'text-green-600 border-4 border-green-600 bg-yellow-400 inline-block py-1 rounded-full px-4'
+const btnLeft = 'text-green-600 border-4 border-green-600 bg-yellow-400 inline-block py-1 rounded-full px-6'
+const btnRight = 'text-green-600  border-4 border-green-600 bg-yellow-400 inline-block py-1 rounded-full px-4'
+const btnUp = 'text-green-600  border-4 border-green-600 bg-yellow-400 inline-block py-1 rounded-full px-8'
+const btnIn = 'text-green-600  border-4 border-green-600 bg-yellow-400 inline-block py-1 rounded-full px-8'
+const btnOut = 'text-green-600  border-4 border-green-600 bg-yellow-400 inline-block py-1 rounded-full px-8'
 
 //send classes to html
 buttonDown.className = btnDown
@@ -162,8 +158,6 @@ function repeatWhileMouseOver(element, action, milliseconds) {
     clearInterval(interval);
   });
 }
-
-
 
 //create renderer
 const renderer = new THREE.WebGLRenderer(
@@ -219,7 +213,6 @@ scene.add(groundVisualBody)
 groundVisualBody.userData.ground = true;
 groundVisualBody.position.copy(groundBody.position)
 groundVisualBody.quaternion.copy(groundBody.quaternion)
-
 
 // Click marker (Sphere) to be shown on interaction
 const markerGeometry = new THREE.SphereGeometry(0.08, 8, 8)
@@ -323,13 +316,6 @@ function wakeUpBlocks(){
   }
 }
 setTimeout(() => { wakeUpBlocks() }, "10000");
-
-
-function zeroOutVelocities(){
-  for (let i = 0; i < blockPhysicsArray.length; i++){  
-      blockPhysicsArray[i].velocity.set(0,0,0)
-  }
-}
 
 //resets tower 
 const resetButton = document.getElementById('button1') //Grab button1 from html
