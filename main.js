@@ -69,7 +69,6 @@ let radialDistance = camera.position.x
 let cameraAngle = 0
 
 function buttonNormalState(){
-
 }
 
 //Move Camera Up
@@ -124,12 +123,6 @@ function repeatWhileMouseOver(element, action, milliseconds) {
       clearInterval(interval);
   });
 }
-
-
-
-//////////CURRENTLY WORKING HERE //////////
-
-
 
 //create renderer
 const renderer = new THREE.WebGLRenderer(
@@ -280,13 +273,14 @@ function getBody(meshUserName){
 function wakeUpBlocks(){
   for (let i = 0; i < blockPhysicsArray.length; i++){
     if(i > 44){ 
+      physicsWorld.allowSleep = false
       blockPhysicsArray[i].speepSpeedLimit = 0   
       blockPhysicsArray[i].sleepState = 0
       console.log(blockPhysicsArray[i])
     }
   }
 }
-wakeUpBlocks()
+setTimeout(() => { wakeUpBlocks() }, "10000");
 
 
 function zeroOutVelocities(){
