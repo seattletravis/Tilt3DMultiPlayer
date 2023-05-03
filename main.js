@@ -161,16 +161,22 @@ function repeatWhileMouseOver(element, action, milliseconds) {
 
 document.addEventListener("keypress", function onEvent(event) {
   if (event.key === "a") {
-      moveCameraLeft()
+    moveCameraLeft()
   }
   else if (event.key === "d") {
-      moveCameraRight()
+    moveCameraRight()
   }
   else if (event.key === "w") {
-      moveCameraUp()
+    moveCameraUp()
   }
   else if (event.key === "s") {
-      moveCameraDown()
+    moveCameraDown()
+  }
+  else if (event.key === "i") {
+    moveCameraIn()
+  }
+  else if (event.key === 'o') {
+    moveCameraOut()
   }
   else { return }
 });
