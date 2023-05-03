@@ -72,7 +72,7 @@ let cameraAngle = 0
 //Move Camera Up
 repeatWhileMouseOver(buttonUp, moveCameraUp, 5)
 function moveCameraUp() {
-  camera.position.y -=.005
+  camera.position.y +=.005
   camera.lookAt(0, camera.position.y, 0)
   buttonUp.className = 'text-green-600 border-4 border-green-600  bg-blue-600 inline-block py-1 rounded-full px-8'
 }
@@ -80,7 +80,7 @@ function moveCameraUp() {
 //Move Camera Down
 repeatWhileMouseOver(buttonDown, moveCameraDown, 5)
 function moveCameraDown() {
-  camera.position.y += 0.005
+  camera.position.y -= 0.005
   camera.lookAt(0, camera.position.y, 0)
   buttonDown.className = 'text-green-600 border-4 border-green-600  bg-blue-600 inline-block px-4 py-1 rounded-full px-4'
 }
@@ -199,7 +199,7 @@ const groundBody = new CANNON.Body({
   type: CANNON.Body.STATIC, // infinite geometric plane
   // sleepSpeedLimit: 10, //SLEEP SPEED LIMIT FOR TABLE
 }) 
-groundBody.position.set(0, -.40, .5)
+groundBody.position.set(0, -0.4, 0) //previous values 0, -.4, .5
 groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0); //rotate groundBody 90 degrees on X-axis
 physicsWorld.addBody(groundBody);
 const groundVisualBody = new THREE.Mesh( //visual part of ground
@@ -273,14 +273,14 @@ for(let i = 0; i <= 17; i++){ //use i <= 17 for 54 blocks
   let blockLayer = i
   let PosY = i*0.30 + .01 
   if(blockLayer%2 == 0){
+    createBlock('block100', {X: 0, Y: PosY, Z: -0.51}, blockShape)
     createBlock('block100', {X: 0, Y: PosY, Z: 0}, blockShape)
-    createBlock('block100', {X: 0, Y: PosY, Z: .505}, blockShape)
-    createBlock('block100', {X: 0, Y: PosY, Z: 1.01}, blockShape)
+    createBlock('block100', {X: 0, Y: PosY, Z: 0.51}, blockShape)
   }
   else{
-    createBlock('block100', {X: 0.51, Y: PosY, Z: .50}, blockShape2)
-    createBlock('block100', {X: 0, Y: PosY, Z: .50}, blockShape2)
-    createBlock('block100', {X: -.51, Y: PosY, Z: .50}, blockShape2)
+    createBlock('block100', {X: 0.51, Y: PosY, Z: 0}, blockShape2)
+    createBlock('block100', {X: 0, Y: PosY, Z: 0}, blockShape2)
+    createBlock('block100', {X: -.51, Y: PosY, Z: 0}, blockShape2)
   }
 }
 
