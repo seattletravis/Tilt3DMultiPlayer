@@ -34,7 +34,7 @@ function linkPhysics() {
 }
 
 //ENVIRONMENTAL VARIABLES
-// physicsWorld.allowSleep = true;
+physicsWorld.allowSleep = true;
 // physicsWorld.defaultContactMaterial.contactEquationRelaxation = 3 //default = 3
 physicsWorld.defaultContactMaterial.contactEquationStiffness = 1e7 //default 10,000,000
 // physicsWorld.defaultContactMaterial.friction = .3 //default = 0.3
@@ -203,7 +203,7 @@ function createBlock(blockName, blockPosition, blockShape){
     blockName = new CANNON.Body({ //physics part of block
       mass: mass,      
       shape: new CANNON.Box(new CANNON.Vec3(blockShape.L, blockShape.H, blockShape.W)),
-      // sleepSpeedLimit: .006, //SLEEP SPEED LIMIT FOR BLOCKS
+       //SLEEP SPEED LIMIT FOR BLOCKS
       angularDamping: .99999,
       material: slipperyMaterial,
     })
@@ -215,7 +215,6 @@ function createBlock(blockName, blockPosition, blockShape){
     new THREE.MeshStandardMaterial({
       map: woodTexture
     }),
-    
   );
   scene.add(blockName)
   blockName.userData.draggable = true;
@@ -266,14 +265,17 @@ function getBody(meshUserName){
 }
 
 
-// function wakeUpBlocks(){
-//   for (let i = 0; i < blockPhysicsArray.length; i++){
-//     if(i > 44){    
-//       blockPhysicsArray[i].applyImpulse(new CANNON.Vec3(0, .0000001, 0), new CANNON.Vec3(0, 0, 0));
-//     }
-//   }
-//   physicsWorld.allowSleep = false
-// }
+function wakeUpBlocks(){
+  for (let i = 0; i < blockPhysicsArray.length; i++){
+    if(i > 44){ 
+      blockPhysicsArray[i].speepSpeedLimit = 0   
+      blockPhysicsArray[i].sleepState = 0
+      console.log(blockPhysicsArray[i])
+    }
+  }
+}
+wakeUpBlocks()
+
 
 function zeroOutVelocities(){
   for (let i = 0; i < blockPhysicsArray.length; i++){  
@@ -428,6 +430,7 @@ window.addEventListener('pointerdown', event => {
       return;
     }
   })
+
 
 //Move Objects
 window.addEventListener('mousemove', event => {
