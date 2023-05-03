@@ -126,9 +126,24 @@ function moveCameraOut() {
   radialDistance += 0.02
   camera.position.x = radialDistance * Math.cos(cameraAngle)
   camera.position.z = radialDistance * Math.sin(cameraAngle)
-  buttonIn.className = 'text-green-600 bg-blue-600 inline-block py-1 rounded-full px-8'
+  buttonOut.className = 'text-green-600 bg-blue-600 inline-block py-1 rounded-full px-8'
 }
 
+//load state for buttons
+const btnDown = 'text-green-600 bg-yellow-400 inline-block py-1 rounded-full px-4'
+const btnLeft = 'text-green-600 bg-yellow-400 inline-block py-1 rounded-full px-6'
+const btnRight = 'text-green-600 bg-yellow-400 inline-block py-1 rounded-full px-4'
+const btnUp = 'text-green-600 bg-yellow-400 inline-block py-1 rounded-full px-8'
+const btnIn = 'text-green-600 bg-yellow-400 inline-block py-1 rounded-full px-8'
+const btnOut = 'text-green-600 bg-yellow-400 inline-block py-1 rounded-full px-8'
+
+//send classes to html
+buttonDown.className = btnDown
+buttonLeft.className = btnLeft
+buttonRight.className = btnRight
+buttonUp.className = btnUp
+buttonIn.className = btnIn
+buttonOut.classList = btnOut
 
 //Hover Controls for Camera Controls
 function repeatWhileMouseOver(element, action, milliseconds) {
@@ -138,14 +153,17 @@ function repeatWhileMouseOver(element, action, milliseconds) {
   });
 
   element.addEventListener('mouseout', function () {
-    buttonDown.className = 'text-green-600 bg-yellow-400 inline-block py-1 rounded-full px-4'
-    buttonLeft.className = 'text-green-600 bg-yellow-400 inline-block py-1 rounded-full px-6'
-    buttonRight.className = 'text-green-600 bg-yellow-400 inline-block py-1 rounded-full px-4'
-    buttonUp.className = 'text-green-600 bg-yellow-400 inline-block py-1 rounded-full px-8'
-    buttonIn.className = 'text-green-600 bg-yellow-400 inline-block py-1 rounded-full px-8'
+    buttonDown.className = btnDown
+    buttonLeft.className = btnLeft
+    buttonRight.className = btnRight
+    buttonUp.className = btnUp
+    buttonIn.className = btnIn
+    buttonOut.classList = btnOut
     clearInterval(interval);
   });
 }
+
+
 
 //create renderer
 const renderer = new THREE.WebGLRenderer(
