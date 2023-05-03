@@ -65,6 +65,8 @@ const buttonLeft = document.getElementById('buttonLeft')
 const buttonUp = document.getElementById('buttonUp')
 const buttonDown = document.getElementById('buttonDown')
 const buttonRight = document.getElementById('buttonRight')
+const buttonIn = document.getElementById('buttonIn')
+const buttonOut = document.getElementById('buttonOut')
 let radialDistance = camera.position.x
 let cameraAngle = 0
 
@@ -108,6 +110,27 @@ function moveCameraRight() {
   buttonRight.className = 'text-green-600 bg-blue-600 inline-block px-4 py-1 rounded-full px-4'
 }
 
+//Zoom Camera In
+repeatWhileMouseOver(buttonIn, moveCameraIn, 20)
+function moveCameraIn() {
+  if (radialDistance <= 4){ return }
+  radialDistance -= 0.02
+  camera.position.x = radialDistance * Math.cos(cameraAngle)
+  camera.position.z = radialDistance * Math.sin(cameraAngle)
+  buttonIn.className = 'text-green-600 bg-blue-600 inline-block py-1 rounded-full px-8'
+}
+
+//Zoom Camera Out
+repeatWhileMouseOver(buttonOut, moveCameraOut, 20)
+function moveCameraOut() {
+  if (radialDistance <= 4){ return }
+  radialDistance += 0.02
+  camera.position.x = radialDistance * Math.cos(cameraAngle)
+  camera.position.z = radialDistance * Math.sin(cameraAngle)
+  buttonIn.className = 'text-green-600 bg-blue-600 inline-block py-1 rounded-full px-8'
+}
+
+
 //Hover Controls for Camera Controls
 function repeatWhileMouseOver(element, action, milliseconds) {
   var interval = null;
@@ -116,11 +139,12 @@ function repeatWhileMouseOver(element, action, milliseconds) {
   });
 
   element.addEventListener('mouseout', function () {
-    buttonDown.className = 'text-green-600 bg-white inline-block py-1 rounded-full px-4'
-    buttonLeft.className = 'text-green-600 bg-white inline-block py-1 rounded-full px-6'
-    buttonRight.className = 'text-green-600 bg-white inline-block py-1 rounded-full px-4'
-    buttonUp.className = 'text-green-600 bg-white inline-block py-1 rounded-full px-8'
-      clearInterval(interval);
+    buttonDown.className = 'text-green-600 bg-yellow-400 inline-block py-1 rounded-full px-4'
+    buttonLeft.className = 'text-green-600 bg-yellow-400 inline-block py-1 rounded-full px-6'
+    buttonRight.className = 'text-green-600 bg-yellow-400 inline-block py-1 rounded-full px-4'
+    buttonUp.className = 'text-green-600 bg-yellow-400 inline-block py-1 rounded-full px-8'
+    buttonIn.className = 'text-green-600 bg-yellow-400 inline-block py-1 rounded-full px-8'
+    clearInterval(interval);
   });
 }
 
