@@ -159,6 +159,31 @@ function repeatWhileMouseOver(element, action, milliseconds) {
   });
 }
 
+document.addEventListener("keypress", function onEvent(event) {
+  if (event.key === "a") {
+      moveCameraLeft()
+  }
+  else if (event.key === "d") {
+      moveCameraRight()
+  }
+  else if (event.key === "w") {
+      moveCameraUp()
+  }
+  else if (event.key === "s") {
+      moveCameraDown()
+  }
+  else { return }
+});
+
+document.addEventListener("keyup", function onEvent(envet) {
+  buttonDown.className = btnDown
+  buttonLeft.className = btnLeft
+  buttonRight.className = btnRight
+  buttonUp.className = btnUp
+  buttonIn.className = btnIn
+  buttonOut.classList = btnOut
+})
+
 //create renderer
 const renderer = new THREE.WebGLRenderer(
     {
