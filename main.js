@@ -160,27 +160,17 @@ function repeatWhileMouseOver(element, action, milliseconds) {
 }
 
 document.addEventListener("keypress", function onEvent(event) {
-  if (event.key === "a") {
-    moveCameraLeft()
-  }
-  else if (event.key === "d") {
-    moveCameraRight()
-  }
-  else if (event.key === "w") {
-    moveCameraUp()
-  }
-  else if (event.key === "s") {
-    moveCameraDown()
-  }
+  if (event.key === "a") { moveCameraLeft() }
+  else if (event.key === "d") { moveCameraRight() }
+  else if (event.key === "w") { moveCameraUp() }
+  else if (event.key === "s") { moveCameraDown() }
   else if (event.key === "i") {
     moveCameraIn()
     moveCameraIn()
-
   }
   else if (event.key === 'o') {
     moveCameraOut()
     moveCameraOut()
-
   }
   else { return }
 });
@@ -205,24 +195,18 @@ renderer.setSize( canvasContainer.offsetWidth, canvasContainer.offsetHeight );
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.shadowMap.enabled = true;
 
-//initialize OrbitControls
-// const controls = new OrbitControls( camera, renderer.domElement )
-// controls.update()
-
 // add ambient light source
-const light = new THREE.AmbientLight( 0xFFFFFF, 0.5 );
+const light = new THREE.AmbientLight( 0xFFFFFF, 0.3 );
 scene.add( light );
 
 //add nice background Image
 const spaceTexture = new THREE.TextureLoader().load('./tower_images/skybox/space2/corona_dn.png')
 scene.background = spaceTexture
 
-
-//add sun light source
-// const sunlight = new THREE.PointLight( 0xFFFFFF, 2, 10000)
-// sunlight.castShadow = true;
-// scene.add( sunlight )
-// sunlight.position.set = (0, 10, 220)
+const gameLight = new THREE.DirectionalLight(0xffffff)
+gameLight.castShadow = true;
+gameLight.position.set(20, 40, 10)
+scene.add( gameLight )
 
 // add ground body to the static plane
 let groundWidth = 1
@@ -240,11 +224,11 @@ groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0); //rotate groundBody 90 d
 physicsWorld.addBody(groundBody);
 const groundVisualBody = new THREE.Mesh( //visual part of ground
   new THREE.BoxGeometry(groundWidth*2, groundLength*2, groundHeight*2),
-  // new THREE.MeshNormalMaterial()
   new THREE.MeshStandardMaterial({
     map: tableTexture
   }),
 )
+groundVisualBody.receiveShadow = true;
 scene.add(groundVisualBody)
 groundVisualBody.userData.ground = true;
 groundVisualBody.position.copy(groundBody.position)
@@ -291,6 +275,7 @@ function createBlock(blockName, blockPosition, blockShape){
       map: woodTexture
     }),
   );
+  blockName.castShadow = true;
   scene.add(blockName)
   blockName.userData.draggable = true;
   blockVisualArray.push(blockName)//add the visual part of the block to the blockVisualArray list
