@@ -203,15 +203,19 @@ scene.add( light );
 const spaceTexture = new THREE.TextureLoader().load('./tower_images/skybox/space2/corona_dn.png')
 scene.background = spaceTexture
 
-const gameLight = new THREE.DirectionalLight(0xffffff)
+//Key Light
+const gameLight = new THREE.PointLight(0xffffff, 1, 2000)
 gameLight.castShadow = true;
-gameLight.position.set(20, 40, 10)
+gameLight.position.set(2, 10, 2)
 scene.add( gameLight )
 
-// add ground body to the static plane
-let groundWidth = 1
+
+
+
+// add ground body to the static plane the ground is the table
+let groundWidth = 10
 let groundHeight = 0.25
-let groundLength = 1
+let groundLength = 10
 const tableTexture = new THREE.TextureLoader().load('./tower_images/wood.jpg')
 
 const groundBody = new CANNON.Body({
@@ -263,7 +267,8 @@ function createBlock(blockName, blockPosition, blockShape){
       mass: mass,      
       shape: new CANNON.Box(new CANNON.Vec3(blockShape.L, blockShape.H, blockShape.W)),
        //SLEEP SPEED LIMIT FOR BLOCKS
-      angularDamping: .99999,
+      angularDamping: 0.5,
+      linearDamping: 0.5,
       material: slipperyMaterial,
     })
     blockName.position.set(blockPosition.X, blockPosition.Y, blockPosition.Z);
@@ -276,6 +281,7 @@ function createBlock(blockName, blockPosition, blockShape){
     }),
   );
   blockName.castShadow = true;
+  // blockName.receiveShadow = true;
   scene.add(blockName)
   blockName.userData.draggable = true;
   blockVisualArray.push(blockName)//add the visual part of the block to the blockVisualArray list
