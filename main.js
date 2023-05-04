@@ -125,6 +125,10 @@ function moveCameraOut() {
   buttonOut.className = 'text-green-600 border-4 border-green-600  bg-blue-600 inline-block py-1 rounded-full px-8'
 }
 
+const buttonEnter = document.getElementById('enterButton');
+const buttonGithub = document.getElementById('githubButton')
+
+
 //load state for buttons
 const btnDown = 'text-green-600 border-4 border-green-600 bg-yellow-400 inline-block py-1 rounded-full px-4'
 const btnLeft = 'text-green-600 border-4 border-green-600 bg-yellow-400 inline-block py-1 rounded-full px-6'
@@ -132,6 +136,8 @@ const btnRight = 'text-green-600  border-4 border-green-600 bg-yellow-400 inline
 const btnUp = 'text-green-600  border-4 border-green-600 bg-yellow-400 inline-block py-1 rounded-full px-8'
 const btnIn = 'text-green-600  border-4 border-green-600 bg-yellow-400 inline-block py-1 rounded-full px-8'
 const btnOut = 'text-green-600  border-4 border-green-600 bg-yellow-400 inline-block py-1 rounded-full px-8'
+const btnEnter = 'text-green-600 bg-yellow-400 font-bold text-center border-4 border-green-600 inline-block text-2xl px-4 rounded-full'
+const btnGithub = 'text-green-600 bg-yellow-400 font-bold text-center border-4 border-green-600 inline-block text-2xl px-4 rounded-full'
 
 //send classes to html
 buttonDown.className = btnDown
@@ -140,6 +146,19 @@ buttonRight.className = btnRight
 buttonUp.className = btnUp
 buttonIn.className = btnIn
 buttonOut.className = btnOut
+buttonEnter.className = btnEnter
+buttonGithub.className = btnGithub
+
+repeatWhileMouseOver(buttonEnter, blueEnter, 10)
+function blueEnter() {
+  enterButton.className = 'text-green-600 bg-blue-600 font-bold text-center border-4 border-green-600 inline-block text-2xl px-4 rounded-full'
+}
+repeatWhileMouseOver(buttonGithub, blueGithub, 10)
+function blueGithub() {
+  githubButton.className = 'text-green-600 bg-blue-600 font-bold text-center border-4 border-green-600 inline-block text-2xl px-4 rounded-full'
+}
+
+
 
 //Hover Controls for Camera Controls
 function repeatWhileMouseOver(element, action, milliseconds) {
@@ -155,6 +174,8 @@ function repeatWhileMouseOver(element, action, milliseconds) {
     buttonUp.className = btnUp
     buttonIn.className = btnIn
     buttonOut.className = btnOut
+    buttonEnter.className = btnEnter
+    buttonGithub.className = btnGithub
     clearInterval(interval);
   });
 }
@@ -162,8 +183,8 @@ function repeatWhileMouseOver(element, action, milliseconds) {
 document.addEventListener("keypress", function onEvent(event) {
   if (event.key === "a") { moveCameraLeft() }
   else if (event.key === "d") { moveCameraRight() }
-  else if (event.key === "w") { moveCameraUp() }
-  else if (event.key === "s") { moveCameraDown() }
+  else if (event.key === "w") { moveCameraUp(); moveCameraUp(); moveCameraUp() }
+  else if (event.key === "s") { moveCameraDown(); moveCameraDown() }
   else if (event.key === "i") {
     moveCameraIn()
     moveCameraIn()
@@ -208,9 +229,6 @@ const gameLight = new THREE.PointLight(0xffffff, 1, 2000)
 gameLight.castShadow = true;
 gameLight.position.set(2, 10, 2)
 scene.add( gameLight )
-
-
-
 
 // add ground body to the static plane the ground is the table
 let groundWidth = 10
@@ -348,10 +366,10 @@ setTimeout(() => { wakeUpBlocks() }, "10000");
 const resetButton = document.getElementById('button1') //Grab button1 from html
 function resetTower() {
   gsap.killTweensOf(physicsWorld.gravity)
-  gameStatus1.className = "text-red-500 px-8"
-  gameStatus2.className = "text-red-500 px-8"
-  gameStatus1.innerText = 'GAME OVER'
-  gameStatus2.innerText = 'RESETTING....'
+  // gameStatus1.className = "text-red-500 px-8"
+  // gameStatus2.className = "text-red-500 px-8"
+  // gameStatus1.innerText = 'GAME OVER'
+  // gameStatus2.innerText = 'RESETTING....'
   gsap.killTweensOf(physicsWorld.gravity);
   physicsWorld.gravity.set(0, -10, 0)
   for (let i = 0; i < blockPhysicsArray.length; i++){
