@@ -139,7 +139,7 @@ buttonLeft.className = btnLeft
 buttonRight.className = btnRight
 buttonUp.className = btnUp
 buttonIn.className = btnIn
-buttonOut.classList = btnOut
+buttonOut.className = btnOut
 
 //Hover Controls for Camera Controls
 function repeatWhileMouseOver(element, action, milliseconds) {
@@ -154,7 +154,7 @@ function repeatWhileMouseOver(element, action, milliseconds) {
     buttonRight.className = btnRight
     buttonUp.className = btnUp
     buttonIn.className = btnIn
-    buttonOut.classList = btnOut
+    buttonOut.className = btnOut
     clearInterval(interval);
   });
 }
@@ -174,20 +174,25 @@ document.addEventListener("keypress", function onEvent(event) {
   }
   else if (event.key === "i") {
     moveCameraIn()
+    moveCameraIn()
+
   }
   else if (event.key === 'o') {
     moveCameraOut()
+    moveCameraOut()
+
   }
   else { return }
 });
 
+//clear keydown class calls
 document.addEventListener("keyup", function onEvent(envet) {
   buttonDown.className = btnDown
   buttonLeft.className = btnLeft
   buttonRight.className = btnRight
   buttonUp.className = btnUp
   buttonIn.className = btnIn
-  buttonOut.classList = btnOut
+  buttonOut.className = btnOut
 })
 
 //create renderer
