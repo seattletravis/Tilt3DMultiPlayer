@@ -16,7 +16,9 @@ const scene = new THREE.Scene();
 const canvasContainer = document.querySelector('#canvasContainer') //Grab canvas Container from document
 const sidePanel = document.querySelector('#sidePanel') // add sidePanel to the DOM
 
-let gravityMaxValue = -3
+let gravityMaxValue = -4
+let blockSleepSpeed = .2
+let sleepInterval = 5000
 //create physics engine - initialize CANNON
 const physicsWorld = new CANNON.World({
   gravity: new CANNON.Vec3(0, gravityMaxValue, 0), //Ramp Gravity up in Function
@@ -56,9 +58,10 @@ window.onresize = function(){
 
 //create camera object
 const camera = new THREE.PerspectiveCamera( 50, canvasContainer.offsetWidth / canvasContainer.offsetHeight, 0.5, 1000 );
-camera.position.set(15, -3, 0)
-camera.lookAt(0, -8, 0)
-let camPosLookDif = -5
+camera.position.set(15, -5, 0)
+camera.lookAt(0, -5, 0)
+let camPosLookDif = 0
+// let radialDistance = 2
 
 // camera.position.set(10, 3, 0)
 // camera.lookAt(0, 3, 0)
@@ -71,7 +74,12 @@ const buttonRight = document.getElementById('buttonRight')
 const buttonIn = document.getElementById('buttonIn')
 const buttonOut = document.getElementById('buttonOut')
 let radialDistance = camera.position.x
-let cameraAngle = 0
+let cameraAngle = Math.PI*.785
+
+camera.position.x = radialDistance * Math.cos(cameraAngle)
+camera.position.z = radialDistance * Math.sin(cameraAngle)
+camera.lookAt(0, camera.position.y + camPosLookDif, 0)
+
 
 //Move Camera Up
 repeatWhileMouseOver(buttonUp, moveCameraUp, 5)
@@ -117,6 +125,8 @@ repeatWhileMouseOver(buttonIn, moveCameraIn, 10)
 function moveCameraIn() {
   if (radialDistance <= 4){ return }
   radialDistance -= 0.02
+  //y adjust
+  // camera.position.y += 0.01
   camera.position.x = radialDistance * Math.cos(cameraAngle)
   camera.position.z = radialDistance * Math.sin(cameraAngle)
   buttonIn.className = 'text-green-600 border-4 border-green-600  bg-blue-600 inline-block py-1 rounded-full px-8'
@@ -126,6 +136,8 @@ function moveCameraIn() {
 repeatWhileMouseOver(buttonOut, moveCameraOut, 10)
 function moveCameraOut() {
   radialDistance += 0.02
+  //y adjust
+  // camera.position.y -= 0.02
   camera.position.x = radialDistance * Math.cos(cameraAngle)
   camera.position.z = radialDistance * Math.sin(cameraAngle)
   buttonOut.className = 'text-green-600 border-4 border-green-600  bg-blue-600 inline-block py-1 rounded-full px-8'
@@ -252,27 +264,43 @@ scene.add( fillLight )
 
 //make a round table top
 const tableTexture = new THREE.TextureLoader().load('./tower_images/wood.jpg')
-
 const tableBody = new CANNON.Body({
   shape: new CANNON.Cylinder(5, 5, .25, 50),
   type: CANNON.Body.STATIC
 })
-
 tableBody.position.set(0, -10.4, 0)
 physicsWorld.addBody(tableBody)
-
 const tableVisualBody = new THREE.Mesh( //visual part of ground
   new THREE.CylinderGeometry(5, 5, .25, 50),
   new THREE.MeshStandardMaterial({
     map: tableTexture
   }),
 )
-
 tableVisualBody.receiveShadow = true;
 scene.add(tableVisualBody)
 tableVisualBody.userData.ground = true;
 tableVisualBody.position.copy(tableBody.position)
 tableVisualBody.quaternion.copy(tableBody.quaternion)
+
+//make a round table Leg
+const tableLegTexture = new THREE.TextureLoader().load('./tower_images/wood.jpg')
+const tableLegBody = new CANNON.Body({
+  shape: new CANNON.Cylinder(.7, .7, 16, 50),
+  type: CANNON.Body.STATIC
+})
+tableLegBody.position.set(0, -18.4, 0)
+physicsWorld.addBody(tableLegBody)
+const tableLegVisualBody = new THREE.Mesh( //visual part of ground
+  new THREE.CylinderGeometry(.7, .7, 16, 50),
+  new THREE.MeshStandardMaterial({
+    map: tableTexture
+  }),
+)
+tableLegVisualBody.receiveShadow = true;
+scene.add(tableLegVisualBody)
+tableLegVisualBody.userData.ground = true;
+tableLegVisualBody.position.copy(tableLegBody.position)
+tableLegVisualBody.quaternion.copy(tableLegBody.quaternion)
 
 // // add ground body to the static plane the ground is the table
 // let groundWidth = 10
@@ -328,8 +356,8 @@ function createBlock(blockName, blockPosition, blockShape){
     blockName = new CANNON.Body({ //physics part of block
       mass: mass,      
       shape: new CANNON.Box(new CANNON.Vec3(blockShape.L, blockShape.H, blockShape.W)),
-       //SLEEP SPEED LIMIT FOR BLOCKS
-      angularDamping: 0.5,
+      sleepSpeedLimit: blockSleepSpeed,
+      angularDamping: 0.9,
       linearDamping: 0.5,
       material: slipperyMaterial,
     })
@@ -405,7 +433,7 @@ function wakeUpBlocks(){
     // }
   }
 }
-// setTimeout(() => { wakeUpBlocks() }, "1000");
+setInterval(() => { wakeUpBlocks() }, sleepInterval);
 
 //resets tower 
 const resetButton = document.getElementById('button1') //Grab button1 from html
@@ -535,6 +563,7 @@ window.addEventListener('pointerdown', event => {
     const hitPoint = getHitPoint(event.clientX, event.clientY, movementPlane, camera)
     if (hitPoint) {
       // Move marker mesh on the contact point
+      wakeUpBlocks()
       moveClickMarker(hitPoint)
       // Move the cannon constraint on the contact point
       moveJoint(hitPoint)
@@ -545,7 +574,7 @@ window.addEventListener('pointerdown', event => {
   window.addEventListener('pointerup', event => {
     isDragging = false
     clickMarker.visible = false; 
-    // physicsWorld.gravity.y = gravityMaxValue
+    wakeUpBlocks()
     removeJointConstraint()
     if (holdingTile == true){
       movementPlane.position.copy(0, 0, 0) //reposition movementPlane out of the way
