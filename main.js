@@ -35,12 +35,12 @@ function linkPhysics() {
 
 //ENVIRONMENTAL VARIABLES
 physicsWorld.allowSleep = true;
-// physicsWorld.defaultContactMaterial.contactEquationRelaxation = 3 //default = 3
-physicsWorld.defaultContactMaterial.contactEquationStiffness = 1e7 //default 10,000,000
+physicsWorld.defaultContactMaterial.contactEquationRestitution = 0 //default = ?
+physicsWorld.defaultContactMaterial.contactEquationStiffness = 5e7 //default 50,000,000
 // physicsWorld.defaultContactMaterial.friction = .3 //default = 0.3
 // physicsWorld.defaultContactMaterial.frictionEquationRelaxation = 3 //default = 3
 // physicsWorld.defaultContactMaterial.frictionEquationStiffness = 10000000 //default = 10,000,000
-physicsWorld.defaultContactMaterial.contactEquationRelaxationTime = 3
+// physicsWorld.defaultContactMaterial.contactEquationRelaxationTime = 3
 // let frict = 10
 // let rest = 0
 // physicsWorld.defaultContactMaterial.materials = [
@@ -335,20 +335,21 @@ const blockToBlockContact = new CANNON.ContactMaterial(
 physicsWorld.addContactMaterial(blockToBlockContact);
 
 //create tower Function - makes calls to createBlock()
-for(let i = 0; i <= 17; i++){ //use i <= 17 for 54 blocks
-  let blockLayer = i
-  let PosY = i*0.30 + .01 - 10
-  if(blockLayer%2 == 0){
-    createBlock('block100', {X: 0, Y: PosY, Z: -0.51}, blockShape)
-    createBlock('block100', {X: 0, Y: PosY, Z: 0}, blockShape)
-    createBlock('block100', {X: 0, Y: PosY, Z: 0.51}, blockShape)
+
+  for(let i = 0; i <= 17; i++){ //use i <= 17 for 54 blocks
+    let blockLayer = i
+    let PosY = i*0.30 + .02 - 10
+      if(blockLayer%2 == 0){
+        createBlock('block100', {X: 0, Y: PosY, Z: -0.51}, blockShape)
+        createBlock('block100', {X: 0, Y: PosY, Z: 0}, blockShape)
+        createBlock('block100', {X: 0, Y: PosY, Z: 0.51}, blockShape)
+      }
+      else{
+        createBlock('block100', {X: 0.51, Y: PosY, Z: 0}, blockShape2)
+        createBlock('block100', {X: 0, Y: PosY, Z: 0}, blockShape2)
+        createBlock('block100', {X: -.51, Y: PosY, Z: 0}, blockShape2)
+      } 
   }
-  else{
-    createBlock('block100', {X: 0.51, Y: PosY, Z: 0}, blockShape2)
-    createBlock('block100', {X: 0, Y: PosY, Z: 0}, blockShape2)
-    createBlock('block100', {X: -.51, Y: PosY, Z: 0}, blockShape2)
-  }
-}
 
 //give all the tiles names in their THREE.userData
 for (let i = 1; i < scene.children.length; i++){
