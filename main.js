@@ -56,8 +56,12 @@ window.onresize = function(){
 
 //create camera object
 const camera = new THREE.PerspectiveCamera( 50, canvasContainer.offsetWidth / canvasContainer.offsetHeight, 0.5, 1000 );
-camera.position.set(10, 3, 0)
-camera.lookAt(0, 3, 0)
+camera.position.set(15, -2, 0)
+camera.lookAt(0, -8, 0)
+let camPosLookDif = -6
+
+// camera.position.set(10, 3, 0)
+// camera.lookAt(0, 3, 0)
 
 //Grab the Camera Buttons
 const buttonLeft = document.getElementById('buttonLeft')
@@ -74,7 +78,7 @@ repeatWhileMouseOver(buttonUp, moveCameraUp, 5)
 function moveCameraUp() {
   camera.position.y +=.005
   panoMesh.position.y -= 0.005
-  camera.lookAt(0, camera.position.y, 0)
+  camera.lookAt(0, camera.position.y + camPosLookDif, 0)
   buttonUp.className = 'text-green-600 border-4 border-green-600  bg-blue-600 inline-block py-1 rounded-full px-8'
 }
 
@@ -83,7 +87,7 @@ repeatWhileMouseOver(buttonDown, moveCameraDown, 5)
 function moveCameraDown() {
   camera.position.y -= 0.005
   panoMesh.position.y += 0.005
-  camera.lookAt(0, camera.position.y, 0)
+  camera.lookAt(0, camera.position.y + camPosLookDif, 0)
   buttonDown.className = 'text-green-600 border-4 border-green-600  bg-blue-600 inline-block px-4 py-1 rounded-full px-4'
 }
 
@@ -94,7 +98,7 @@ function moveCameraLeft() {
   // camera.position.y = cameraPosY
   camera.position.x = radialDistance * Math.cos(cameraAngle)
   camera.position.z = radialDistance * Math.sin(cameraAngle)
-  camera.lookAt(0, camera.position.y, 0)
+  camera.lookAt(0, camera.position.y + camPosLookDif, 0)
   buttonLeft.className = 'text-green-600 border-4 border-green-600  bg-blue-600 inline-block px-4 py-1 rounded-full px-6'
 }
 
@@ -104,7 +108,7 @@ function moveCameraRight() {
   cameraAngle -= Math.PI/180
   camera.position.x = radialDistance * Math.cos(cameraAngle)
   camera.position.z = radialDistance * Math.sin(cameraAngle)
-  camera.lookAt(0, camera.position.y, 0)
+  camera.lookAt(0, camera.position.y + camPosLookDif, 0)
   buttonRight.className = 'text-green-600 border-4 border-green-600  bg-blue-600 inline-block px-4 py-1 rounded-full px-4'
 }
 
@@ -258,7 +262,7 @@ const groundBody = new CANNON.Body({
   type: CANNON.Body.STATIC, // infinite geometric plane
   // sleepSpeedLimit: 10, //SLEEP SPEED LIMIT FOR TABLE
 }) 
-groundBody.position.set(0, -0.4, 0) //previous values 0, -.4, .5
+groundBody.position.set(0, -10.4, 0) //previous values 0, -.4, .5
 groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0); //rotate groundBody 90 degrees on X-axis
 physicsWorld.addBody(groundBody);
 const groundVisualBody = new THREE.Mesh( //visual part of ground
