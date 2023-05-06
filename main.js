@@ -220,15 +220,30 @@ renderer.shadowMap.enabled = true;
 const light = new THREE.AmbientLight( 0xFFFFFF, 0.3 );
 scene.add( light );
 
-//add nice background Image
-const spaceTexture = new THREE.TextureLoader().load('./tower_images/skybox/space2/corona_dn.png')
-scene.background = spaceTexture
+//add pano as BG
+var panoGeometry = new THREE.SphereGeometry( 50, 60, 40 );
+  panoGeometry.scale( - 1, 1, 1 );
+
+  var panoMaterial = new THREE.MeshBasicMaterial( {
+    map: new THREE.TextureLoader().load( './tower_images/pano.jpg' )
+  } );
+
+  var panoMesh = new THREE.Mesh( panoGeometry, panoMaterial );
+  panoMesh.position.set(0, 0, 0)
+  scene.add( panoMesh );
 
 //Key Light
-const gameLight = new THREE.PointLight(0xffffff, 1, 2000)
+const gameLight = new THREE.PointLight(0xffffff, .3, 2000)
 gameLight.castShadow = true;
-gameLight.position.set(2, 10, 2)
+gameLight.position.set(-3, 10, 3)
 scene.add( gameLight )
+
+//Fill Light
+const fillLight = new THREE.PointLight(0xffffff, .1, 2000)
+fillLight.castShadow = true;
+fillLight.position.set(2, 10, -2)
+scene.add( fillLight )
+
 
 // add ground body to the static plane the ground is the table
 let groundWidth = 10
