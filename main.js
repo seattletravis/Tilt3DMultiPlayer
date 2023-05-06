@@ -56,9 +56,9 @@ window.onresize = function(){
 
 //create camera object
 const camera = new THREE.PerspectiveCamera( 50, canvasContainer.offsetWidth / canvasContainer.offsetHeight, 0.5, 1000 );
-camera.position.set(15, -2, 0)
+camera.position.set(15, -3, 0)
 camera.lookAt(0, -8, 0)
-let camPosLookDif = -6
+let camPosLookDif = -5
 
 // camera.position.set(10, 3, 0)
 // camera.lookAt(0, 3, 0)
@@ -241,13 +241,13 @@ var panoGeometry = new THREE.SphereGeometry( 50, 60, 40 );
 //Key Light
 const gameLight = new THREE.PointLight(0xffffff, .3, 2000)
 gameLight.castShadow = true;
-gameLight.position.set(-3, 10, 3)
+gameLight.position.set(-3, 1, 3)
 scene.add( gameLight )
 
 //Fill Light
 const fillLight = new THREE.PointLight(0xffffff, .1, 2000)
 fillLight.castShadow = true;
-fillLight.position.set(2, 10, -2)
+fillLight.position.set(2, 1, -2)
 scene.add( fillLight )
 
 
@@ -337,7 +337,7 @@ physicsWorld.addContactMaterial(blockToBlockContact);
 //create tower Function - makes calls to createBlock()
 for(let i = 0; i <= 17; i++){ //use i <= 17 for 54 blocks
   let blockLayer = i
-  let PosY = i*0.30 + .01 
+  let PosY = i*0.30 + .01 - 10
   if(blockLayer%2 == 0){
     createBlock('block100', {X: 0, Y: PosY, Z: -0.51}, blockShape)
     createBlock('block100', {X: 0, Y: PosY, Z: 0}, blockShape)
