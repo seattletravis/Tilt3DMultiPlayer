@@ -190,13 +190,9 @@ document.addEventListener("keypress", function onEvent(event) {
   else if (event.key === "d") { moveCameraRight() }
   else if (event.key === "w") { moveCameraUp(); moveCameraUp(); moveCameraUp() }
   else if (event.key === "s") { moveCameraDown(); moveCameraDown() }
-  else if (event.key === "i") {
-    moveCameraIn()
-    moveCameraIn()
-  } else if (event.key === 'o') {
-    moveCameraOut()
-    moveCameraOut()
-  } else if (event.key ==='r') {
+  else if (event.key === "i") { moveCameraIn() } 
+  else if (event.key === 'o') { moveCameraOut() } 
+  else if (event.key ==='r') {
     console.log(currentBody)
     console.log('retrieve currentMesh')
     // block = blockVisualArray[40]

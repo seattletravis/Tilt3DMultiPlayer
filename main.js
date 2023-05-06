@@ -73,6 +73,7 @@ let cameraAngle = 0
 repeatWhileMouseOver(buttonUp, moveCameraUp, 5)
 function moveCameraUp() {
   camera.position.y +=.005
+  panoMesh.position.y -= 0.005
   camera.lookAt(0, camera.position.y, 0)
   buttonUp.className = 'text-green-600 border-4 border-green-600  bg-blue-600 inline-block py-1 rounded-full px-8'
 }
@@ -81,6 +82,7 @@ function moveCameraUp() {
 repeatWhileMouseOver(buttonDown, moveCameraDown, 5)
 function moveCameraDown() {
   camera.position.y -= 0.005
+  panoMesh.position.y += 0.005
   camera.lookAt(0, camera.position.y, 0)
   buttonDown.className = 'text-green-600 border-4 border-green-600  bg-blue-600 inline-block px-4 py-1 rounded-full px-4'
 }
