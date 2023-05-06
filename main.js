@@ -373,16 +373,16 @@ function getBody(meshUserName){
 //Block stay asleep until nudged - results in a bug. KEEP WORKING ON THIS BUG
 function wakeUpBlocks(){ 
   for (let i = 0; i < blockPhysicsArray.length; i++){
-    if(i > 44){ 
-      physicsWorld.allowSleep = false
-      blockPhysicsArray[i].speepSpeedLimit = 0   
-      blockPhysicsArray[i].sleepState = 1
+    // if(i > 41){ 
+      // physicsWorld.allowSleep = false
+      // blockPhysicsArray[i].speepSpeedLimit = 0   
+      blockPhysicsArray[i].sleepState = 0
       // console.log(blockPhysicsArray[i])
       // console.log(physicsWorld.allowSleep)
-    }
+    // }
   }
 }
-setTimeout(() => { wakeUpBlocks() }, "10000");
+// setTimeout(() => { wakeUpBlocks() }, "1000");
 
 //resets tower 
 const resetButton = document.getElementById('button1') //Grab button1 from html
@@ -488,10 +488,9 @@ window.addEventListener('pointerdown', event => {
   raycaster.setFromCamera( clickMouse, camera );
   const found = raycaster.intersectObjects( scene.children );
   if (found.length > 0 && found[0].object.userData.draggable){
-    // if(physicsWorld.allowSleep == true){ wakeUpBlocks() }
-    // wakeUpBlocks()
+    wakeUpBlocks() //Make a call to the wakeUpBlocks Function
     draggable = found[0].object
-    physicsWorld.gravity.set(0, -1, 0)
+    // physicsWorld.gravity.set(0, -1, 0)
     holdingTile = true;
     const hitPoint = getHitPoint(event.clientX, event.clientY, draggable, camera)
     if (!hitPoint){ return }
@@ -523,7 +522,7 @@ window.addEventListener('pointerdown', event => {
   window.addEventListener('pointerup', event => {
     isDragging = false
     clickMarker.visible = false; 
-    physicsWorld.gravity.y = gravityMaxValue
+    // physicsWorld.gravity.y = gravityMaxValue
     removeJointConstraint()
     if (holdingTile == true){
       movementPlane.position.copy(0, 0, 0) //reposition movementPlane out of the way
@@ -550,6 +549,7 @@ function animate() {
   // cannonDebugger.update()
   linkPhysics()
   renderer.render( scene, camera );
+  
 }
 
 animate();
