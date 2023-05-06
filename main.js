@@ -250,32 +250,55 @@ fillLight.castShadow = true;
 fillLight.position.set(2, 1, -2)
 scene.add( fillLight )
 
-
-// add ground body to the static plane the ground is the table
-let groundWidth = 10
-let groundHeight = 0.25
-let groundLength = 10
+//make a round table top
 const tableTexture = new THREE.TextureLoader().load('./tower_images/wood.jpg')
 
-const groundBody = new CANNON.Body({
-  shape: new CANNON.Box(new CANNON.Vec3(groundWidth, groundLength, groundHeight)),
-  type: CANNON.Body.STATIC, // infinite geometric plane
-  // sleepSpeedLimit: 10, //SLEEP SPEED LIMIT FOR TABLE
-}) 
-groundBody.position.set(0, -10.4, 0) //previous values 0, -.4, .5
-groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0); //rotate groundBody 90 degrees on X-axis
-physicsWorld.addBody(groundBody);
-const groundVisualBody = new THREE.Mesh( //visual part of ground
-  new THREE.BoxGeometry(groundWidth*2, groundLength*2, groundHeight*2),
+const tableBody = new CANNON.Body({
+  shape: new CANNON.Cylinder(5, 5, .25, 50),
+  type: CANNON.Body.STATIC
+})
+
+tableBody.position.set(0, -10.4, 0)
+physicsWorld.addBody(tableBody)
+
+const tableVisualBody = new THREE.Mesh( //visual part of ground
+  new THREE.CylinderGeometry(5, 5, .25, 50),
   new THREE.MeshStandardMaterial({
     map: tableTexture
   }),
 )
-groundVisualBody.receiveShadow = true;
-scene.add(groundVisualBody)
-groundVisualBody.userData.ground = true;
-groundVisualBody.position.copy(groundBody.position)
-groundVisualBody.quaternion.copy(groundBody.quaternion)
+
+tableVisualBody.receiveShadow = true;
+scene.add(tableVisualBody)
+tableVisualBody.userData.ground = true;
+tableVisualBody.position.copy(tableBody.position)
+tableVisualBody.quaternion.copy(tableBody.quaternion)
+
+// // add ground body to the static plane the ground is the table
+// let groundWidth = 10
+// let groundHeight = 0.25
+// let groundLength = 10
+// // const tableTexture = new THREE.TextureLoader().load('./tower_images/wood.jpg')
+
+// const groundBody = new CANNON.Body({
+//   shape: new CANNON.Box(new CANNON.Vec3(groundWidth, groundLength, groundHeight)),
+//   type: CANNON.Body.STATIC, // infinite geometric plane
+//   // sleepSpeedLimit: 10, //SLEEP SPEED LIMIT FOR TABLE
+// }) 
+// groundBody.position.set(0, -10.4, 0) //previous values 0, -.4, .5
+// groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0); //rotate groundBody 90 degrees on X-axis
+// physicsWorld.addBody(groundBody);
+// const groundVisualBody = new THREE.Mesh( //visual part of ground
+//   new THREE.BoxGeometry(groundWidth*2, groundLength*2, groundHeight*2),
+//   new THREE.MeshStandardMaterial({
+//     map: tableTexture
+//   }),
+// )
+// groundVisualBody.receiveShadow = true;
+// scene.add(groundVisualBody)
+// groundVisualBody.userData.ground = true;
+// groundVisualBody.position.copy(groundBody.position)
+// groundVisualBody.quaternion.copy(groundBody.quaternion)
 
 // Click marker (Sphere) to be shown on interaction
 const markerGeometry = new THREE.SphereGeometry(0.08, 8, 8)
