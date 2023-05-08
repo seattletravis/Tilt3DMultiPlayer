@@ -57,9 +57,9 @@ window.onresize = function(){
 }
 
 //create camera object
-const camera = new THREE.PerspectiveCamera( 50, canvasContainer.offsetWidth / canvasContainer.offsetHeight, 0.5, 1000 );
-camera.position.set(15, -5, 0)
-camera.lookAt(0, -5, 0)
+const camera = new THREE.PerspectiveCamera( 45, canvasContainer.offsetWidth / canvasContainer.offsetHeight, 0.5, 1000 );
+camera.position.set(15, -7, 0)
+camera.lookAt(0, -7, 0)
 let camPosLookDif = 0
 // let radialDistance = 2
 
@@ -433,7 +433,7 @@ function wakeUpBlocks(){
     // }
   }
 }
-setInterval(() => { wakeUpBlocks() }, sleepInterval);
+// setInterval(() => { wakeUpBlocks() }, sleepInterval);
 
 //resets tower 
 const resetButton = document.getElementById('button1') //Grab button1 from html
@@ -483,14 +483,14 @@ function moveMovementPlane(point, camera){
 }
 
 //Get Center Point for PointToPointConstaint Function
-function getCenterPoint(mesh) {
-  var geometry = mesh.geometry;
-  geometry.computeBoundingBox();
-  var center = new THREE.Vector3();
-  geometry.boundingBox.getCenter( center );
-  mesh.localToWorld( center );
-  return center;
-}
+// function getCenterPoint(mesh) {
+//   var geometry = mesh.geometry;
+//   geometry.computeBoundingBox();
+//   var center = new THREE.Vector3();
+//   geometry.boundingBox.getCenter( center );
+//   mesh.localToWorld( center );
+//   return center;
+// }
 
 // Joint body, to later constraint the cube
 let jointBody
