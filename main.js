@@ -363,23 +363,23 @@ physicsWorld.addContactMaterial(blockToBlockContact);
     let blockLayer = i
     let PosY = i*0.30 + .02 - 10
       if(blockLayer%2 == 0){
-        let randomBlockName1 = 'logo' + Math.ceil(Math.random()*6)
+        let randomBlockName1 = 'logo' + Math.ceil(Math.random()*12)
         const logo1 = new THREE.TextureLoader().load('./tower_images/'+ randomBlockName1 +'.png')
-        let randomBlockTopBottom1 = 'topBottomA' + Math.ceil(Math.random()*5)
+        let randomBlockTopBottom1 = 'topBottomA' + Math.ceil(Math.random()*10)
         const topBottomBlock1 = new THREE.TextureLoader().load('./tower_images/'+ randomBlockTopBottom1 +'.png')
-        let randomBlockName2 = 'logo' + Math.ceil(Math.random()*6)
+        let randomBlockName2 = 'logo' + Math.ceil(Math.random()*12)
         const logo2 = new THREE.TextureLoader().load('./tower_images/'+ randomBlockName2 +'.png')
-        let randomBlockTopBottom2 = 'topBottomA' + Math.ceil(Math.random()*5)
+        let randomBlockTopBottom2 = 'topBottomA' + Math.ceil(Math.random()*10)
         const topBottomBlock2 = new THREE.TextureLoader().load('./tower_images/'+ randomBlockTopBottom2 +'.png')
-        let randomBlockName3 = 'logo' + Math.ceil(Math.random()*6)
+        let randomBlockName3 = 'logo' + Math.ceil(Math.random()*12)
         const logo3 = new THREE.TextureLoader().load('./tower_images/'+ randomBlockName3 +'.png')
-        let randomBlockTopBottom3 = 'topBottomA' + Math.ceil(Math.random()*5)
+        let randomBlockTopBottom3 = 'topBottomA' + Math.ceil(Math.random()*10)
         const topBottomBlock3 = new THREE.TextureLoader().load('./tower_images/'+ randomBlockTopBottom3 +'.png')     
         const blockMeshArray1 = [
           new THREE.MeshBasicMaterial( { map: wood }),
           new THREE.MeshBasicMaterial( { map: wood }),
           new THREE.MeshBasicMaterial( { map: topBottomBlock1 }),
-          new THREE.MeshBasicMaterial( { map: topBottomBlock1 }),
+          new THREE.MeshBasicMaterial( { map: topBottomBlock2 }),
           new THREE.MeshBasicMaterial( { map: logo1 }),
           new THREE.MeshBasicMaterial( { map: logo1 }),
         ]
@@ -387,7 +387,7 @@ physicsWorld.addContactMaterial(blockToBlockContact);
           new THREE.MeshBasicMaterial( { map: wood }),
           new THREE.MeshBasicMaterial( { map: wood }),
           new THREE.MeshBasicMaterial( { map: topBottomBlock2 }),
-          new THREE.MeshBasicMaterial( { map: topBottomBlock2 }),
+          new THREE.MeshBasicMaterial( { map: topBottomBlock3 }),
           new THREE.MeshBasicMaterial( { map: logo2 }),
           new THREE.MeshBasicMaterial( { map: logo2 }),
         ]
@@ -395,7 +395,7 @@ physicsWorld.addContactMaterial(blockToBlockContact);
           new THREE.MeshBasicMaterial( { map: wood }),
           new THREE.MeshBasicMaterial( { map: wood }),
           new THREE.MeshBasicMaterial( { map: topBottomBlock3 }),
-          new THREE.MeshBasicMaterial( { map: topBottomBlock3 }),
+          new THREE.MeshBasicMaterial( { map: topBottomBlock1 }),
           new THREE.MeshBasicMaterial( { map: logo3 }),
           new THREE.MeshBasicMaterial( { map: logo3 }),
         ]
@@ -404,23 +404,23 @@ physicsWorld.addContactMaterial(blockToBlockContact);
         createBlock('block100', {X: 0, Y: PosY, Z: 0.51}, blockShape, blockMeshArray3)
       }
       else{
-        let randomBlockName1 = 'logo' + Math.ceil(Math.random()*6)
+        let randomBlockName1 = 'logo' + Math.ceil(Math.random()*12)
         const logo1 = new THREE.TextureLoader().load('./tower_images/'+ randomBlockName1 +'.png')
-        let randomBlockTopBottom1 = 'topBottomB' + Math.ceil(Math.random()*5)
+        let randomBlockTopBottom1 = 'topBottomB' + Math.ceil(Math.random()*10)
         const topBottomBlock1 = new THREE.TextureLoader().load('./tower_images/'+ randomBlockTopBottom1 +'.png')
-        let randomBlockName2 = 'logo' + Math.ceil(Math.random()*6)
+        let randomBlockName2 = 'logo' + Math.ceil(Math.random()*12)
         const logo2 = new THREE.TextureLoader().load('./tower_images/'+ randomBlockName2 +'.png')
-        let randomBlockTopBottom2 = 'topBottomB' + Math.ceil(Math.random()*5)
+        let randomBlockTopBottom2 = 'topBottomB' + Math.ceil(Math.random()*10)
         const topBottomBlock2 = new THREE.TextureLoader().load('./tower_images/'+ randomBlockTopBottom2 +'.png')
-        let randomBlockName3 = 'logo' + Math.ceil(Math.random()*6)
+        let randomBlockName3 = 'logo' + Math.ceil(Math.random()*12)
         const logo3 = new THREE.TextureLoader().load('./tower_images/'+ randomBlockName3 +'.png')
-        let randomBlockTopBottom3 = 'topBottomB' + Math.ceil(Math.random()*5)
+        let randomBlockTopBottom3 = 'topBottomB' + Math.ceil(Math.random()*10)
         const topBottomBlock3 = new THREE.TextureLoader().load('./tower_images/'+ randomBlockTopBottom3 +'.png')    
         const blockMeshArray1 = [
           new THREE.MeshBasicMaterial( { map: logo1 }),
           new THREE.MeshBasicMaterial( { map: logo1 }),
           new THREE.MeshBasicMaterial( { map: topBottomBlock1 }),
-          new THREE.MeshBasicMaterial( { map: topBottomBlock1 }),
+          new THREE.MeshBasicMaterial( { map: topBottomBlock2 }),
           new THREE.MeshBasicMaterial( { map: wood }),
           new THREE.MeshBasicMaterial( { map: wood }),
         ]
@@ -428,7 +428,7 @@ physicsWorld.addContactMaterial(blockToBlockContact);
           new THREE.MeshBasicMaterial( { map: logo2 }),
           new THREE.MeshBasicMaterial( { map: logo2 }),
           new THREE.MeshBasicMaterial( { map: topBottomBlock2 }),
-          new THREE.MeshBasicMaterial( { map: topBottomBlock2 }),
+          new THREE.MeshBasicMaterial( { map: topBottomBlock3 }),
           new THREE.MeshBasicMaterial( { map: wood }),
           new THREE.MeshBasicMaterial( { map: wood }),
         ]
@@ -436,7 +436,7 @@ physicsWorld.addContactMaterial(blockToBlockContact);
           new THREE.MeshBasicMaterial( { map: logo3 }),
           new THREE.MeshBasicMaterial( { map: logo3 }),
           new THREE.MeshBasicMaterial( { map: topBottomBlock3 }),
-          new THREE.MeshBasicMaterial( { map: topBottomBlock3 }),
+          new THREE.MeshBasicMaterial( { map: topBottomBlock1 }),
           new THREE.MeshBasicMaterial( { map: wood }),
           new THREE.MeshBasicMaterial( { map: wood }),
         ]
