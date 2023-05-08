@@ -300,6 +300,18 @@ tableLegVisualBody.userData.ground = true;
 tableLegVisualBody.position.copy(tableLegBody.position)
 tableLegVisualBody.quaternion.copy(tableLegBody.quaternion)
 
+//Drop Markers Make 2 Drop Tile Markers for Scoring Points
+const dropSphereGeopmetry = new THREE.SphereGeometry(2, 15, 15)
+const dropRedSphereMaterial = new THREE.MeshLambertMaterial({ color: 0xff0000 })
+const dropBlueSphereMaterial = new THREE.MeshLambertMaterial({ color: 0x0000ff })
+let redDrop = new THREE.Mesh(dropSphereGeopmetry, dropRedSphereMaterial)
+redDrop.position.set(18, 0, -7)
+scene.add(redDrop)
+let blueDrop = new THREE.Mesh(dropSphereGeopmetry, dropBlueSphereMaterial)
+blueDrop.position.set(11, 0,  -15)
+scene.add(blueDrop)
+
+
 // Click marker (Sphere) to be shown on interaction
 const markerGeometry = new THREE.SphereGeometry(0.08, 8, 8)
 const markerMaterial = new THREE.MeshLambertMaterial({ color: 0xff0000 })
