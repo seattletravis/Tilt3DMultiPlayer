@@ -39,26 +39,26 @@
         <!-- GAME CONTROLS PANEL -->
         <div class="border-2 border-green-600 rounded-lg">
           <h1 class="text-green-600 text-xl">Game Controls</h1><br>
-          <H2 class="text-green-600 text-xl px-8">HOVER OVER TO CONTROL CAMERA: </H2>
+          <H2 class="text-green-600 text-xl px-8">HOVER OVER CONTROLS: </H2>
           <br>
 
-          <!-- LOOKING FOR THE CLASSES FOR THE BUTTONS? - LOOK IN MAIN.JS LINE 132 -->
-          <div class="text-green-600 flex font-bold">
-            <div id="leftSideButtons" class="flex flex-col items-center w-1/2 ">
+          <!-- LOOKING FOR THE CLASSES FOR THE BUTTONS? - LOOK IN MAIN.JS LINE ~150 -->
+          <div class=" flex justify-center items-center text-green-600 font-bold">
+
+            <div id="leftSideButtons" class="w-1/2">
               <div class="flex flex-col items-center">
                 <h3 id="buttonUp">UP</h3>
-              <div class="flex">
-                <h3 id="buttonLeft">LEFT</h3>   
-                <h3 id="buttonRight">RIGHT</h3>
-              </div>
+                <div class="flex">
+                  <h3 id="buttonLeft">LEFT</h3>   
+                  <h3 id="buttonRight">RIGHT</h3>
+                </div>
                 <h3 id="buttonDown">DOWN</h3>
               </div>
             </div>
 
-            <div id="rightSideButtons" class="flex flex-col items-center w-1/2">
+            <div id="rightSideButtons" class="w-1/2 flex justify-center flex-col items-center">
               <h3 id="buttonIn">IN</h3>
               <h1 class="text-center text-green-600 px-8">ZOOM</h1>
-
               <h3 id="buttonOut">OUT</h3>
             </div>
 
@@ -71,10 +71,6 @@
               <button id="button1" title="Restack" class="font-bold border-4 border-white text-yellow-400 bg-red-900 border-yellow-400 inline-block px-4 py-1 rounded-full">RESET TOWER</button>
           </div>
           <br>
-          <!-- <div class="border-2 rounded-lg">
-              <H1 id="gameStatus1" class="text-green-600 px-8">3D PROJECT IN JAVASCRIPT</H1>
-              <H1 id="gameStatus2" class="text-green-600 px-8">LETS PLAY!</H1> 
-          </div> -->
         </div>
       </div>
       <!-- RIGHT SIDE PANEL - GAME SCREEN -->
