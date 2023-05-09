@@ -15,17 +15,14 @@ gsap.registerPlugin(Flip, EaselPlugin, TextPlugin);
 const scene = new THREE.Scene();
 const canvasContainer = document.querySelector('#canvasContainer') //Grab canvas Container from document
 const sidePanel = document.querySelector('#sidePanel') // add sidePanel to the DOM
-
 let gravityMaxValue = -4
 let blockSleepSpeed = .2
-let sleepInterval = 5000
+
+
 //create physics engine - initialize CANNON
 const physicsWorld = new CANNON.World({
   gravity: new CANNON.Vec3(0, gravityMaxValue, 0), //Ramp Gravity up in Function
 })
-
-// const gameStatus1 = document.getElementById('gameStatus1')
-// const gameStatus2 = document.getElementById('gameStatus2')
 
   //Function to apply visual bodies to physics bodies - call from animate()
 function linkPhysics() {
@@ -37,34 +34,21 @@ function linkPhysics() {
 
 //ENVIRONMENTAL VARIABLES
 physicsWorld.allowSleep = true;
-physicsWorld.defaultContactMaterial.contactEquationRestitution = 0 //default = ?
-physicsWorld.defaultContactMaterial.contactEquationStiffness = 5e7 //default 50,000,000
-// physicsWorld.defaultContactMaterial.friction = .3 //default = 0.3
-// physicsWorld.defaultContactMaterial.frictionEquationRelaxation = 3 //default = 3
-// physicsWorld.defaultContactMaterial.frictionEquationStiffness = 10000000 //default = 10,000,000
-// physicsWorld.defaultContactMaterial.contactEquationRelaxationTime = 3
-// let frict = 10
-// let rest = 0
-// physicsWorld.defaultContactMaterial.materials = [
-//   {name: 'default', id: 0, friction: frict, restitution: rest},
-//   {name: 'default', id: 0, friction: frict, restitution: rest}
-// ]
+physicsWorld.defaultContactMaterial.contactEquationRestitution = 0.0001 //default = ?
+physicsWorld.defaultContactMaterial.contactEquationStiffness = 500000000//default 50,000,000
+// physicsWorld.defaultContactMaterial.friction = 0 //default = 0.3
+physicsWorld.defaultContactMaterial.frictionEquationRelaxation = 1 //default = 3
+physicsWorld.defaultContactMaterial.contactEquationRelaxationTime = 1
 // console.log(physicsWorld.defaultContactMaterial)
 
 //Window resize handler
-window.onresize = function(){ 
-    resetTower()
-}
+window.onresize = function(){ resetTower() }
 
 //create camera object
 const camera = new THREE.PerspectiveCamera( 45, canvasContainer.offsetWidth / canvasContainer.offsetHeight, 0.5, 1000 );
 camera.position.set(15, -7, 0)
 camera.lookAt(0, -7, 0)
 let camPosLookDif = 0
-// let radialDistance = 2
-
-// camera.position.set(10, 3, 0)
-// camera.lookAt(0, 3, 0)
 
 //Grab the Camera Buttons
 const buttonLeft = document.getElementById('buttonLeft')
@@ -80,11 +64,18 @@ camera.position.x = radialDistance * Math.cos(cameraAngle)
 camera.position.z = radialDistance * Math.sin(cameraAngle)
 camera.lookAt(0, camera.position.y + camPosLookDif, 0)
 
+//declare the score sphere position info here
+let sphereSize = 1
+let scoreBallY = -3
+let scoreRadialDistance = 10
+let redAngle = 2 * Math.PI * .96
+let blueAngle = 2 * Math.PI * .83
+
 
 //Move Camera Up
 repeatWhileMouseOver(buttonUp, moveCameraUp, 5)
 function moveCameraUp() {
-  camera.position.y +=.005
+  camera.position.y += 0.005
   panoMesh.position.y -= 0.005
   camera.lookAt(0, camera.position.y + camPosLookDif, 0)
   buttonUp.className = 'text-green-600 border-4 border-green-600  bg-blue-600 inline-block py-1 rounded-full px-8'
@@ -102,8 +93,13 @@ function moveCameraDown() {
 //Move Camera Left
 repeatWhileMouseOver(buttonLeft, moveCameraLeft, 20)
 function moveCameraLeft() {
+  blueAngle += Math.PI/180
+  blueDrop.position.x = scoreRadialDistance * Math.cos(blueAngle)
+  blueDrop.position.z = scoreRadialDistance * Math.sin(blueAngle)
+  redAngle += Math.PI/180
+  redDrop.position.x = scoreRadialDistance * Math.cos(redAngle)
+  redDrop.position.z = scoreRadialDistance * Math.sin(redAngle)
   cameraAngle += Math.PI/180
-  // camera.position.y = cameraPosY
   camera.position.x = radialDistance * Math.cos(cameraAngle)
   camera.position.z = radialDistance * Math.sin(cameraAngle)
   camera.lookAt(0, camera.position.y + camPosLookDif, 0)
@@ -113,6 +109,12 @@ function moveCameraLeft() {
 //Move Camera Right
 repeatWhileMouseOver(buttonRight, moveCameraRight, 20)
 function moveCameraRight() {
+  blueAngle -= Math.PI/180
+  blueDrop.position.x = scoreRadialDistance * Math.cos(blueAngle)
+  blueDrop.position.z = scoreRadialDistance * Math.sin(blueAngle)
+  redAngle -= Math.PI/180
+  redDrop.position.x = scoreRadialDistance * Math.cos(redAngle)
+  redDrop.position.z = scoreRadialDistance * Math.sin(redAngle)
   cameraAngle -= Math.PI/180
   camera.position.x = radialDistance * Math.cos(cameraAngle)
   camera.position.z = radialDistance * Math.sin(cameraAngle)
@@ -301,16 +303,15 @@ tableLegVisualBody.position.copy(tableLegBody.position)
 tableLegVisualBody.quaternion.copy(tableLegBody.quaternion)
 
 //Drop Markers Make 2 Drop Tile Markers for Scoring Points
-const dropSphereGeopmetry = new THREE.SphereGeometry(2, 15, 15)
+const dropSphereGeopmetry = new THREE.SphereGeometry(sphereSize, 15, 15)
 const dropRedSphereMaterial = new THREE.MeshLambertMaterial({ color: 0xff0000 })
 const dropBlueSphereMaterial = new THREE.MeshLambertMaterial({ color: 0x0000ff })
 let redDrop = new THREE.Mesh(dropSphereGeopmetry, dropRedSphereMaterial)
-redDrop.position.set(18, 0, -7)
+redDrop.position.set(scoreRadialDistance * Math.cos(redAngle), scoreBallY, scoreRadialDistance * Math.sin(redAngle))
 scene.add(redDrop)
 let blueDrop = new THREE.Mesh(dropSphereGeopmetry, dropBlueSphereMaterial)
-blueDrop.position.set(11, 0,  -15)
+blueDrop.position.set(scoreRadialDistance * Math.cos(blueAngle), scoreBallY, scoreRadialDistance * Math.sin(blueAngle))
 scene.add(blueDrop)
-
 
 // Click marker (Sphere) to be shown on interaction
 const markerGeometry = new THREE.SphereGeometry(0.08, 8, 8)
