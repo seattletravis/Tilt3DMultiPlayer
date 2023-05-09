@@ -639,27 +639,6 @@ window.addEventListener('pointerdown', event => {
       clickMouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
       raycaster.setFromCamera( clickMouse, camera );
       const found = raycaster.intersectObjects( scene.children );
-
-      for(let i = 0; i < found.length; i++){
-        if (found[i].object == redDrop && !redDroppability){
-          redDroppability = true;
-          setTimeout(function(){
-            redDroppability = false
-          }, 1000)
-        }
-        if (found[i].object == blueDrop && !blueDroppability){
-          blueDroppability = true;
-          setTimeout(function(){
-            blueDroppability = false
-          }, 1000)
-      };
-      console.log('red bubble is ' + redDroppability);
-      console.log('blue bubble is ' + blueDroppability)
-        
-    }
-
-
-///////////////////////////////////////WORKING ON IT HERE //////////////////////////////////////
       wakeUpBlocks()
       moveClickMarker(hitPoint)
       moveJoint(hitPoint)
@@ -691,12 +670,20 @@ window.addEventListener('pointerdown', event => {
         draggable.geometry.dispose
         draggable.material.dispose
         scene.remove( draggable )
+        setTimeout(function(){
+          redDroppability = false
+        }, 10)
+        console.log('Red Scores!')
       }
 
       if ( blueDroppability == true ){
         draggable.geometry.dispose
         draggable.material.dispose
         scene.remove( draggable )
+        setTimeout(function(){
+          blueDroppability = false
+        }, 10)
+        console.log('Blue Scores')
       }
 
 
