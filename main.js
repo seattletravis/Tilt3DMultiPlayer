@@ -5,7 +5,7 @@ import { EaselPlugin } from "gsap/EaselPlugin";
 import { TextPlugin } from "gsap/TextPlugin";
 import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
-// import CannonDebugger from 'cannon-es-debugger';
+import CannonDebugger from 'cannon-es-debugger';
 // import { space } from 'postcss/lib/list';
 // import { TweenMax } from 'gsap/gsap-core';
 
@@ -17,6 +17,7 @@ const canvasContainer = document.querySelector('#canvasContainer') //Grab canvas
 const sidePanel = document.querySelector('#sidePanel') // add sidePanel to the DOM
 let gravityMaxValue = -4
 let blockSleepSpeed = .2
+let sleepInterval = 1000
 
 
 //create physics engine - initialize CANNON
@@ -30,6 +31,8 @@ function linkPhysics() {
     blockVisualArray[i].position.copy(blockPhysicsArray[i].position)
     blockVisualArray[i].quaternion.copy(blockPhysicsArray[i].quaternion)
   }
+  topBlockMesh.position.copy(topBlock.position)
+  topBlockMesh.quaternion.copy(topBlock.quaternion)
 }
 
 //ENVIRONMENTAL VARIABLES
@@ -68,8 +71,8 @@ camera.lookAt(0, camera.position.y + camPosLookDif, 0)
 let sphereSize = 1
 let scoreBallY = -4
 let scoreRadialDistance = 10
-let redAngle = 2 * Math.PI * .96
-let blueAngle = 2 * Math.PI * .83
+let redAngle = 2 * Math.PI * .83
+let blueAngle = 2 * Math.PI * .96
 
 
 //Move Camera Up
@@ -283,7 +286,6 @@ tableVisualBody.position.copy(tableBody.position)
 tableVisualBody.quaternion.copy(tableBody.quaternion)
 
 //make a round table Leg
-const tableLegTexture = new THREE.TextureLoader().load('./tower_images/wood.jpg')
 const tableLegBody = new CANNON.Body({
   shape: new CANNON.Cylinder(.7, .7, 16, 50),
   type: CANNON.Body.STATIC
@@ -312,20 +314,15 @@ scene.add(redDrop)
 let blueDrop = new THREE.Mesh(dropSphereGeopmetry, dropBlueSphereMaterial)
 blueDrop.position.set(scoreRadialDistance * Math.cos(blueAngle), scoreBallY, scoreRadialDistance * Math.sin(blueAngle))
 scene.add(blueDrop)
+//add tags to drop bubbles for game scoring mechanics
 blueDrop.userData.name = 'blueDrop'
 blueDrop.userData.scorable == true
 redDrop.userData.name = 'redDrop'
 redDrop.userData.scorable == true
-// console.log(scene.children)
-// for (let i = 0; i < scene.children.length; i++){
-//   console.log(found[i])
-// }
-
-////////////////////////////////////////WORKING HERE ///////////////////////////////////////////
 
 // Click marker (Sphere) to be shown on interaction
 const markerGeometry = new THREE.SphereGeometry(0.08, 8, 8)
-const markerMaterial = new THREE.MeshLambertMaterial({ color: 0xff0000 })
+const markerMaterial = new THREE.MeshLambertMaterial({ color: 0x00ff00 })
 let clickMarker = new THREE.Mesh(markerGeometry, markerMaterial)
 clickMarker.visible = false // Hide it..
 scene.add(clickMarker)
@@ -373,12 +370,37 @@ new THREE.BoxGeometry(blockShape.L*2, blockShape.H*2, blockShape.W*2),
   blockVisualArray.push(blockName)//add the visual part of the block to the blockVisualArray list
 }
 
+
+// Add contact material to world
 const blockToBlockContact = new CANNON.ContactMaterial(
   slipperyMaterial,
   slipperyMaterial,
   {friction: 0.01}
 )
 physicsWorld.addContactMaterial(blockToBlockContact);
+
+// create top block function
+const topBlockTexture = new THREE.TextureLoader().load('./tower_images/wood.jpg')
+const mass = 0.00001;
+const topBlock = new CANNON.Body({
+  shape: new CANNON.Cylinder(0.75, 0.75, 0.25, 25),
+  mass: mass,
+  material: slipperyMaterial
+})
+topBlock.position.set(0, -4, 0)
+physicsWorld.addBody(topBlock)
+const topBlockMesh = new THREE.Mesh( //visual part of ground
+  new THREE.CylinderGeometry(.75, .75, .25, 25),
+  new THREE.MeshStandardMaterial({
+    map: topBlockTexture
+  }),
+)
+scene.add(topBlockMesh)
+topBlockMesh.position.copy(topBlock.position)
+topBlockMesh.quaternion.copy(topBlock.quaternion)
+
+///////////////////////////////////////CREATE EXPLODE TRIGGER MECHANISM /////////////////////////////////
+
 
 //create tower Function - makes calls to createBlock()
   for(let i = 0; i <= 17; i++){ //use i <= 17 for 54 blocks
@@ -585,14 +607,11 @@ const moveMouse = new THREE.Vector2();
 var draggable = new THREE.Object3D();
 var scorable = new THREE.Object3D();
 var holdingTile = false;
-
-
 let jointConstraint
 let currentBody
 let isDragging = false
-let redScore = false
-// Initialize & allow gameplay after tiles have settled down
 
+// Initialize & allow gameplay after tiles have settled down
 window.addEventListener('pointerdown', event => {
   clickMouse.x = ((event.clientX - sidePanel.offsetWidth) / canvasContainer.offsetWidth) * 2 - 1;
   clickMouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -617,34 +636,27 @@ window.addEventListener('pointerdown', event => {
   }
 })
 
-// function resetScoreBubble() {
-//   for (let i = 0; i < scene.children.length; i++){
-//     if (scene.children[i].material){
-//       scene.children[i].material.opacity = 1.0;
-//     }
-//   }
-// }
-
   let redDroppability = false
   let blueDroppability = false
-
-
   //Mouse Movement Action
   window.addEventListener('pointermove', (event) => {
     if (!isDragging) { return }
     const hitPoint = getHitPoint(event.clientX, event.clientY, movementPlane, camera)
     if (hitPoint) {
-
-      clickMouse.x = ((event.clientX - sidePanel.offsetWidth) / canvasContainer.offsetWidth) * 2 - 1;
-      clickMouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-      raycaster.setFromCamera( clickMouse, camera );
-      const found = raycaster.intersectObjects( scene.children );
+      // clickMouse.x = ((event.clientX - sidePanel.offsetWidth) / canvasContainer.offsetWidth) * 2 - 1;
+      // clickMouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+      // raycaster.setFromCamera( clickMouse, camera );
+      // const found = raycaster.intersectObjects( scene.children );
       wakeUpBlocks()
       moveClickMarker(hitPoint)
       moveJoint(hitPoint)
     }
   })
   
+  const blueScore = document.getElementById('blueScore')
+  const redScore = document.getElementById('redScore')
+  let redsScore = 0
+  let bluesScore = 0
   //When Release Mouse Clicker, show tile that's being dropped
   window.addEventListener('pointerup', event => {
     isDragging = false
@@ -652,7 +664,6 @@ window.addEventListener('pointerdown', event => {
     wakeUpBlocks()
     removeJointConstraint()
     if (holdingTile == true){
-
       clickMouse.x = ((event.clientX - sidePanel.offsetWidth) / canvasContainer.offsetWidth) * 2 - 1;
       clickMouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
       raycaster.setFromCamera( clickMouse, camera );
@@ -666,39 +677,35 @@ window.addEventListener('pointerdown', event => {
           blueDroppability = true;
       };
     }
-      if ( redDroppability == true ){
-        draggable.geometry.dispose
-        draggable.material.dispose
-        scene.remove( draggable )
-        setTimeout(function(){
-          redDroppability = false
-        }, 10)
-        console.log('Red Scores!')
-      }
-
-      if ( blueDroppability == true ){
-        draggable.geometry.dispose
-        draggable.material.dispose
-        scene.remove( draggable )
-        setTimeout(function(){
-          blueDroppability = false
-        }, 10)
-        console.log('Blue Scores')
-      }
-
-
-
-
-
-      movementPlane.position.copy(0, 0, 0) //reposition movementPlane out of the way
-      holdingTile = false;
-      return;
+    if ( redDroppability == true ){
+      draggable.geometry.dispose
+      draggable.material.dispose
+      scene.remove( draggable )
+      const moveBody = getBody(draggable)
+      moveBody.position.set(0, -100, 2)
+      setTimeout(function(){
+        redDroppability = false
+      }, 10)
+      redsScore += 10
+      redScore.innerHTML = "RED: " + redsScore
+    }
+    if ( blueDroppability == true ){
+      draggable.geometry.dispose
+      draggable.material.dispose
+      scene.remove( draggable )
+      const moveBody = getBody(draggable)
+      moveBody.position.set(0, -100, 2)
+      setTimeout(function(){
+        blueDroppability = false
+      }, 10)
+      bluesScore += 10
+      blueScore.innerHTML = "RED: " + bluesScore
+    }
+    movementPlane.position.copy(0, 0, 0) //reposition movementPlane out of the way
+    holdingTile = false;
+    return;
     }
   })
-
-  /////////////////// MODIFY THIS FUNCTION TO ADD SCORING////////////////////////////
-
-
 
 //Move Objects
 window.addEventListener('mousemove', event => {
@@ -706,18 +713,17 @@ window.addEventListener('mousemove', event => {
     moveMouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 })
 
-//Cannon Debugger
-// const cannonDebugger = new CannonDebugger(scene, physicsWorld,{
-// })
+// Cannon Debugger
+const cannonDebugger = new CannonDebugger(scene, physicsWorld,{
+})
 
 //ANIMATION FUNCTION
 function animate() {
   requestAnimationFrame( animate );
   physicsWorld.fixedStep()
-  // cannonDebugger.update()
+  cannonDebugger.update()
   linkPhysics()
   renderer.render( scene, camera );
-  
 }
 
 animate();
