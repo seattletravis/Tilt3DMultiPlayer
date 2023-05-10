@@ -49,7 +49,7 @@ window.onresize = function(){ resetTower() }
 
 //create camera object
 const camera = new THREE.PerspectiveCamera( 45, canvasContainer.offsetWidth / canvasContainer.offsetHeight, 0.5, 1000 );
-camera.position.set(15, -7, 0)
+camera.position.set(12, -7, 0)
 camera.lookAt(0, -7, 0)
 let camPosLookDif = 0
 
@@ -285,6 +285,16 @@ tableVisualBody.userData.ground = true;
 tableVisualBody.position.copy(tableBody.position)
 tableVisualBody.quaternion.copy(tableBody.quaternion)
 
+//make a center line visual
+const lineMaterial = new THREE.LineBasicMaterial( { color: 0xff0000 } );
+const points = [];
+points.push( new THREE.Vector3( 0, -100, 0 ) );
+points.push( new THREE.Vector3( 0, 100, 0 ) );
+const lineGeometry = new THREE.BufferGeometry().setFromPoints( points );
+const lineVisual = new THREE.Line( lineGeometry, lineMaterial );
+scene.add(lineVisual)
+
+
 //make a round table Leg
 const tableLegBody = new CANNON.Body({
   shape: new CANNON.Cylinder(.7, .7, 16, 50),
@@ -379,7 +389,7 @@ const blockToBlockContact = new CANNON.ContactMaterial(
 physicsWorld.addContactMaterial(blockToBlockContact);
 
 const resetMeter = document.getElementById('resetMeter')
-resetMeter.value = 0
+// resetMeter.value = 0
 // create top block function -------------------///////////////////////WORKING HERE!!!!!
 const topBlockTexture = new THREE.TextureLoader().load('./tower_images/wood.jpg')
 const mass = 0.00001;
@@ -403,7 +413,9 @@ topBlockMesh.quaternion.copy(topBlock.quaternion)
 
 
 //get mid x and z of topblock center
-const gameMessage = document.getElementById('gameControls')
+let resetButtonPressed = false
+const gameMessage = document.getElementById('gameControl')
+// gameMessage.innerHTML = 'Hello World'
 const maxScore = document.getElementById('maxScore')
 let adjustedPoints
 
@@ -414,13 +426,25 @@ function getCenterOfTopBlock(){
   resetMeter.value = offCenterDistance * resetSensitivity
   adjustedPoints = 100 - Math.floor(resetMeter.value * 10)
 
-  maxScore.innerHTML = "MAX SCORE: " + adjustedPoints + ")"
-  if (resetMeter.value >= 10){
+  maxScore.innerHTML = "(MAX SCORE: " + adjustedPoints + ")"
+  if (resetMeter.value >= 10 && resetButtonPressed == false){
+    resetButtonPressed = true
     explodeTower()
-    
+    if (redsScore > bluesScore){
+      gameMessage.innerHTML = "RED WINS - BLUE DROOLS!"
+      gameMessage.className = "text-red-600 text-xl"
+    }else if (redsScore < bluesScore){
+      gameMessage.innerHTML = "BLUE WINS - BETTER LUCK NEXT TIME RED!"
+      gameMessage.className = "text-blue-600 text-xl"
+
+
+    }else{
+      gameMessage.innerHTML = "DRAW - PLAY AGAIN?"
+      gameMessage.className = "text-yellow-400 text-xl"
+
+    }
 
   }
-
 }
 
 
@@ -551,22 +575,17 @@ function wakeUpBlocks(){
 function explodeTower() {
   physicsWorld.gravity.set(0, -10, 0)
   for (let i = 0; i < blockPhysicsArray.length; i++){
-    let randoX = (Math.random()-.5) * .0005
-    let randoZ = (Math.random()-.5) * .0005
-    let randoY = (Math.random()) * .0002
+    let randoX = (Math.random() - 0.5) * .0005
+    let randoZ = (Math.random() - 0.5) * .0005
+    let randoY = (Math.random()) * .000005
     blockPhysicsArray[i].applyImpulse(new CANNON.Vec3(randoX, randoY, randoZ), new CANNON.Vec3(0, 0, 0));
   }
-  topBlock.applyImpulse(new CANNON.Vec3((Math.random()-.5) * .0005, (Math.random()-.5) * .0005, (Math.random()-.5) * .0005), new CANNON.Vec3(0, 0, 0));
+  topBlock.applyImpulse(new CANNON.Vec3((Math.random()-.5) * .000005, Math.random() * .0005, (Math.random()-.5) * .000005), new CANNON.Vec3(0, 0, 0));
 }
-
 
 //resets tower 
 const resetButton = document.getElementById('button1') //Grab button1 from html
-function resetTower() {
-  explodeTower()
-setTimeout( function() { location.reload() }, 2000 ) 
-}
-
+function resetTower() { location.reload() }
 resetButton.addEventListener('click', function(){ //give Button functionality - BUTTON ARMED
   resetTower()
 })
@@ -595,16 +614,6 @@ function moveMovementPlane(point, camera){
   movementPlane.position.copy(point)
   movementPlane.quaternion.copy(camera.quaternion)
 }
-
-//Get Center Point for PointToPointConstaint Function
-// function getCenterPoint(mesh) {
-//   var geometry = mesh.geometry;
-//   geometry.computeBoundingBox();
-//   var center = new THREE.Vector3();
-//   geometry.boundingBox.getCenter( center );
-//   mesh.localToWorld( center );
-//   return center;
-// }
 
 // Joint body, to later constraint the cube
 let jointBody
