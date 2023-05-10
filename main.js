@@ -5,7 +5,7 @@ import { EaselPlugin } from "gsap/EaselPlugin";
 import { TextPlugin } from "gsap/TextPlugin";
 import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
-import CannonDebugger from 'cannon-es-debugger';
+// import CannonDebugger from 'cannon-es-debugger';
 // import { space } from 'postcss/lib/list';
 // import { TweenMax } from 'gsap/gsap-core';
 
@@ -17,8 +17,6 @@ const canvasContainer = document.querySelector('#canvasContainer') //Grab canvas
 const sidePanel = document.querySelector('#sidePanel') // add sidePanel to the DOM
 let gravityMaxValue = -4
 let blockSleepSpeed = .2
-let sleepInterval = 1000
-
 let resetSensitivity = 16
 
 
@@ -406,12 +404,17 @@ topBlockMesh.quaternion.copy(topBlock.quaternion)
 
 //get mid x and z of topblock center
 const gameMessage = document.getElementById('gameControls')
+const maxScore = document.getElementById('maxScore')
+let adjustedPoints
 
 function getCenterOfTopBlock(){
   let xPosSqr = Math.abs(topBlock.position.x) * Math.abs(topBlock.position.x)
   let zPosSqr = Math.abs(topBlock.position.z) * Math.abs(topBlock.position.z)
   let offCenterDistance = Math.sqrt(xPosSqr + zPosSqr)
   resetMeter.value = offCenterDistance * resetSensitivity
+  adjustedPoints = 100 - Math.floor(resetMeter.value * 10)
+
+  maxScore.innerHTML = "MAX SCORE: " + adjustedPoints + ")"
   if (resetMeter.value >= 10){
     explodeTower()
     
@@ -561,13 +564,6 @@ function explodeTower() {
 const resetButton = document.getElementById('button1') //Grab button1 from html
 function resetTower() {
   explodeTower()
-  // physicsWorld.gravity.set(0, -10, 0)
-  // for (let i = 0; i < blockPhysicsArray.length; i++){
-  //   let randoX = (Math.random()-.5) * .0005
-  //   let randoZ = (Math.random()-.5) * .0005
-  //   let randoY = (Math.random()) * .0002
-  //   blockPhysicsArray[i].applyImpulse(new CANNON.Vec3(randoX, randoY, randoZ), new CANNON.Vec3(0, 0, 0));
-  // }
 setTimeout( function() { location.reload() }, 2000 ) 
 }
 
@@ -724,7 +720,7 @@ window.addEventListener('pointerdown', event => {
       setTimeout(function(){
         redDroppability = false
       }, 10)
-      redsScore += 10
+      redsScore += adjustedPoints
       redScore.innerHTML = "RED: " + redsScore
     }
     if ( blueDroppability == true ){
@@ -736,7 +732,7 @@ window.addEventListener('pointerdown', event => {
       setTimeout(function(){
         blueDroppability = false
       }, 10)
-      bluesScore += 10
+      bluesScore += adjustedPoints
       blueScore.innerHTML = "RED: " + bluesScore
     }
     movementPlane.position.copy(0, 0, 0) //reposition movementPlane out of the way
@@ -752,14 +748,14 @@ window.addEventListener('mousemove', event => {
 })
 
 // Cannon Debugger
-const cannonDebugger = new CannonDebugger(scene, physicsWorld,{
-})
+// const cannonDebugger = new CannonDebugger(scene, physicsWorld,{
+// })
 
 //ANIMATION FUNCTION
 function animate() {
   requestAnimationFrame( animate );
   physicsWorld.fixedStep()
-  cannonDebugger.update()
+  // cannonDebugger.update()
   linkPhysics()
   renderer.render( scene, camera );
   getCenterOfTopBlock()
