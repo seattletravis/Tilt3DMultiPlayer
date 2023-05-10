@@ -19,6 +19,11 @@ let gravityMaxValue = -4
 let blockSleepSpeed = .2
 let resetSensitivity = 16
 
+const gameInfo = document.getElementById("gameInfo")
+gameInfo.addEventListener("mouseover", ()=>{ gameInfo.className = "float-right text-blue-600 font-bold text-2xl" })
+gameInfo.addEventListener("mouseout", ()=>{ gameInfo.className = "float-right text-yellow-400 font-bold text-2xl" })
+
+
 
 //create physics engine - initialize CANNON
 const physicsWorld = new CANNON.World({
