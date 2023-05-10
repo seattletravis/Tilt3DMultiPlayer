@@ -9,7 +9,7 @@
   <body>
     <div class="flex h-screen bg-black select-none">
       <!-- LEFT SIDE PANEL CONTROLS AND INFO -->
-      <div id="sidePanel" class="border-4 border-white w-1/2 flex flex-col justify-center px-2">
+      <div id="sidePanel" class="border-4 border-green-600 w-1/2 flex flex-col justify-center px-2">
         <!-- TRAVIS.LAMBERTE.COM -->
         <h1 class="text-center text-green-600 px-4 text-2xl">TRAVIS.LAMBERTE.COM</h1><br>
 
@@ -38,7 +38,8 @@
 
         <!-- GAME CONTROLS PANEL -->
         <div class="border-2 border-green-600 rounded-lg">
-          <h1 class="text-green-600 text-xl">Game Controls</h1><br>
+          <h1 id="gameControl" class="text-green-600 text-xl">Game Controls</h1>
+          <br>
           <H2 class="text-green-600 text-xl px-8">HOVER OVER CONTROLS: </H2>
           <br>
 
@@ -69,7 +70,12 @@
           <br>
           <div class="px-8 flex flex-col items-center">
               <button id="button1" title="Restack" class="font-bold border-4 border-white text-yellow-400 bg-red-900 border-yellow-400 inline-block px-4 py-1 rounded-full">RESET TOWER</button>
-          </div>
+              <br>
+              <h1 class="text-red-900 text-2xl">DANGER METER</h1>
+              <input id="resetMeter" type="range" class="w-2/3 ml-6 accent-red-900" min="0" max="10" step="0.01"/>
+            </div>
+          
+
           <br>
         </div>
       </div>

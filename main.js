@@ -19,6 +19,8 @@ let gravityMaxValue = -4
 let blockSleepSpeed = .2
 let sleepInterval = 1000
 
+let resetSensitivity = 16
+
 
 //create physics engine - initialize CANNON
 const physicsWorld = new CANNON.World({
@@ -370,7 +372,6 @@ new THREE.BoxGeometry(blockShape.L*2, blockShape.H*2, blockShape.W*2),
   blockVisualArray.push(blockName)//add the visual part of the block to the blockVisualArray list
 }
 
-
 // Add contact material to world
 const blockToBlockContact = new CANNON.ContactMaterial(
   slipperyMaterial,
@@ -379,7 +380,9 @@ const blockToBlockContact = new CANNON.ContactMaterial(
 )
 physicsWorld.addContactMaterial(blockToBlockContact);
 
-// create top block function
+const resetMeter = document.getElementById('resetMeter')
+resetMeter.value = 0
+// create top block function -------------------///////////////////////WORKING HERE!!!!!
 const topBlockTexture = new THREE.TextureLoader().load('./tower_images/wood.jpg')
 const mass = 0.00001;
 const topBlock = new CANNON.Body({
@@ -387,7 +390,7 @@ const topBlock = new CANNON.Body({
   mass: mass,
   material: slipperyMaterial
 })
-topBlock.position.set(0, -4, 0)
+topBlock.position.set(0, -4.6, 0)
 physicsWorld.addBody(topBlock)
 const topBlockMesh = new THREE.Mesh( //visual part of ground
   new THREE.CylinderGeometry(.75, .75, .25, 25),
@@ -396,8 +399,27 @@ const topBlockMesh = new THREE.Mesh( //visual part of ground
   }),
 )
 scene.add(topBlockMesh)
+topBlockMesh.userData.name = 'topBlock'
 topBlockMesh.position.copy(topBlock.position)
 topBlockMesh.quaternion.copy(topBlock.quaternion)
+
+
+//get mid x and z of topblock center
+const gameMessage = document.getElementById('gameControls')
+
+function getCenterOfTopBlock(){
+  let xPosSqr = Math.abs(topBlock.position.x) * Math.abs(topBlock.position.x)
+  let zPosSqr = Math.abs(topBlock.position.z) * Math.abs(topBlock.position.z)
+  let offCenterDistance = Math.sqrt(xPosSqr + zPosSqr)
+  resetMeter.value = offCenterDistance * resetSensitivity
+  if (resetMeter.value >= 10){
+    explodeTower()
+    
+
+  }
+
+}
+
 
 ///////////////////////////////////////CREATE EXPLODE TRIGGER MECHANISM /////////////////////////////////
 
@@ -516,14 +538,14 @@ function wakeUpBlocks(){
       // physicsWorld.allowSleep = false
       // blockPhysicsArray[i].speepSpeedLimit = 0   
       blockPhysicsArray[i].sleepState = 0
+      topBlock.sleepState = 0
     // }
   }
 }
 // setInterval(() => { wakeUpBlocks() }, sleepInterval);
 
-//resets tower 
-const resetButton = document.getElementById('button1') //Grab button1 from html
-function resetTower() {
+//explode tower and display end of game info
+function explodeTower() {
   physicsWorld.gravity.set(0, -10, 0)
   for (let i = 0; i < blockPhysicsArray.length; i++){
     let randoX = (Math.random()-.5) * .0005
@@ -531,8 +553,24 @@ function resetTower() {
     let randoY = (Math.random()) * .0002
     blockPhysicsArray[i].applyImpulse(new CANNON.Vec3(randoX, randoY, randoZ), new CANNON.Vec3(0, 0, 0));
   }
+  topBlock.applyImpulse(new CANNON.Vec3((Math.random()-.5) * .0005, (Math.random()-.5) * .0005, (Math.random()-.5) * .0005), new CANNON.Vec3(0, 0, 0));
+}
+
+
+//resets tower 
+const resetButton = document.getElementById('button1') //Grab button1 from html
+function resetTower() {
+  explodeTower()
+  // physicsWorld.gravity.set(0, -10, 0)
+  // for (let i = 0; i < blockPhysicsArray.length; i++){
+  //   let randoX = (Math.random()-.5) * .0005
+  //   let randoZ = (Math.random()-.5) * .0005
+  //   let randoY = (Math.random()) * .0002
+  //   blockPhysicsArray[i].applyImpulse(new CANNON.Vec3(randoX, randoY, randoZ), new CANNON.Vec3(0, 0, 0));
+  // }
 setTimeout( function() { location.reload() }, 2000 ) 
 }
+
 resetButton.addEventListener('click', function(){ //give Button functionality - BUTTON ARMED
   resetTower()
 })
@@ -724,6 +762,7 @@ function animate() {
   cannonDebugger.update()
   linkPhysics()
   renderer.render( scene, camera );
+  getCenterOfTopBlock()
 }
 
 animate();
