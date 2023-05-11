@@ -4,6 +4,7 @@ import { Flip } from "gsap/Flip";
 import { EaselPlugin } from "gsap/EaselPlugin";
 import { TextPlugin } from "gsap/TextPlugin";
 import * as THREE from 'three';
+import { RoundedBoxGeometry } from './node_modules/three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import * as CANNON from 'cannon-es';
 // import CannonDebugger from 'cannon-es-debugger';
 // import { space } from 'postcss/lib/list';
@@ -291,7 +292,7 @@ tableVisualBody.position.copy(tableBody.position)
 tableVisualBody.quaternion.copy(tableBody.quaternion)
 
 //make a center line visual
-const lineMaterial = new THREE.LineBasicMaterial( { color: 0xff0000 } );
+const lineMaterial = new THREE.LineBasicMaterial( { color: 0x009900 } );
 const points = [];
 points.push( new THREE.Vector3( 0, -100, 0 ) );
 points.push( new THREE.Vector3( 0, 100, 0 ) );
@@ -299,6 +300,7 @@ const lineGeometry = new THREE.BufferGeometry().setFromPoints( points );
 const lineVisual = new THREE.Line( lineGeometry, lineMaterial );
 scene.add(lineVisual)
 
+// lineVisual.material.color.setHex(0x990000)
 
 //make a round table Leg
 const tableLegBody = new CANNON.Body({
@@ -357,6 +359,7 @@ const blockVisualArray = [];
 const slipperyMaterial = new CANNON.Material();
 const wood = new THREE.TextureLoader().load('./tower_images/wood.jpg')
 
+
 //create block function
 function createBlock(blockName, blockPosition, blockShape, blockMeshArray){
   const mass = 0.00001;
@@ -371,9 +374,11 @@ function createBlock(blockName, blockPosition, blockShape, blockMeshArray){
     blockName.position.set(blockPosition.X, blockPosition.Y, blockPosition.Z);
     physicsWorld.addBody(blockName)  
     blockPhysicsArray.push(blockName)//add the blocks to List blockPhysicsArray
-    blockName = new THREE.Mesh( //visual part of block
-new THREE.BoxGeometry(blockShape.L*2, blockShape.H*2, blockShape.W*2),
-    blockMeshArray
+    const roundedBoxGeometry = new RoundedBoxGeometry(blockShape.L*2, blockShape.H*2, blockShape.W*2, 10, .04)
+    blockName = new THREE.Mesh(
+      // new THREE.BoxGeometry(blockShape.L*2, blockShape.H*2, blockShape.W*2),
+      roundedBoxGeometry,
+      blockMeshArray
     // new THREE.MeshStandardMaterial({
     //   map: woodTexture
   //   }),
