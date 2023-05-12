@@ -321,14 +321,16 @@ tableLegVisualBody.quaternion.copy(tableLegBody.quaternion)
 const dropSphereGeopmetry = new THREE.SphereGeometry(sphereSize, 15, 15)
 const dropRedSphereMaterial = new THREE.MeshPhysicalMaterial({ 
   color: 0xff0000,
+  transparent: true,
   metalness: 0.1,
-  opacity: 0.8,
+  opacity: 1,
   roughness: 0.4,
 })
 const dropBlueSphereMaterial = new THREE.MeshPhysicalMaterial({ 
   color: 0x0000ff,   
+  transparent: true,
   metalness: 0.1,
-  opacity: 0.8,
+  opacity: 0.4,
   roughness: 0.4,
 })
 let redDrop = new THREE.Mesh(dropSphereGeopmetry, dropRedSphereMaterial)
@@ -406,9 +408,6 @@ physicsWorld.addContactMaterial(blockToBlockContact);
 
 const resetMeter = document.getElementById('resetMeter')
 
-
-
-// resetMeter.value = 0
 // create top block function -------------------///////////////////////WORKING HERE!!!!!
 const topBlockTexture = new THREE.TextureLoader().load('./tower_images/wood.jpg')
 const mass = 0.00001;
@@ -442,50 +441,41 @@ const dangerMeterText = document.getElementById('dangerMeterText')
 dangerMeterText.style.color = 'rgb(0, 0, 255'
 lineVisual.material.color.setRGB(0, 0, 255)
 
+//Get center of the tower and end game code
 function getCenterOfTopBlock(){
   let xPosSqr = Math.abs(topBlock.position.x) * Math.abs(topBlock.position.x)
   let zPosSqr = Math.abs(topBlock.position.z) * Math.abs(topBlock.position.z)
   let offCenterDistance = Math.sqrt(xPosSqr + zPosSqr)
-
   let colorOffsetRed = Math.ceil(offCenterDistance*500)
   let colorOffsetGreen = 255 - colorOffsetRed
   if(colorOffsetRed > 255){ colorOffsetRed = 255 }
   if (colorOffsetGreen < 0){ colorOffsetGreen = 0 }
-  
   dangerMeterText.style.color = 'rgb('+colorOffsetRed+','+colorOffsetGreen+', 0'
   lineVisual.material.color.setRGB(colorOffsetRed, colorOffsetGreen, 0)
-  console.log(colorOffsetRed, colorOffsetGreen)
-
   resetMeter.value = offCenterDistance * resetSensitivity
   adjustedPoints = 100 - Math.floor(resetMeter.value * 10)
- 
+  //If the tower tilts too much initiate end of game sequence
   maxScore.innerHTML = "(MAX SCORE: " + adjustedPoints + ")"
   if (resetMeter.value >= 10 && resetButtonPressed == false){
     resetButtonPressed = true
+    gameOver = true
     explodeTower()
     if (redsScore > bluesScore){
       gameMessage.innerHTML = "RED WINS - BLUE DROOLS!"
       gameMessage.className = "float-left text-red-600 text-xl"
       gameInfo.className = "float-right text-yellow-400 font-bold text-2xl"
-
     }else if (redsScore < bluesScore){
       gameMessage.innerHTML = "BLUE WINS - BETTER LUCK NEXT TIME RED!"
       gameMessage.className = "float-left text-blue-600 text-xl"
       gameInfo.className = "float-right text-yellow-400 font-bold text-2xl"
-
     }else{
       gameMessage.innerHTML = "DRAW - PLAY AGAIN?"
       gameMessage.className = "float-left text-yellow-400 text-xl"
       gameInfo.className = "float-right text-yellow-400 font-bold text-2xl"
-
     }
-
   }
 }
-
-
 ///////////////////////////////////////CREATE EXPLODE TRIGGER MECHANISM /////////////////////////////////
-
 
 //create tower Function - makes calls to createBlock()
   for(let i = 0; i <= 17; i++){ //use i <= 17 for 54 blocks
@@ -691,6 +681,7 @@ let currentBody
 let isDragging = false
 
 // Initialize & allow gameplay after tiles have settled down
+let gameOver = false
 window.addEventListener('pointerdown', event => {
   clickMouse.x = ((event.clientX - sidePanel.offsetWidth) / canvasContainer.offsetWidth) * 2 - 1;
   clickMouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -756,14 +747,15 @@ window.addEventListener('pointerdown', event => {
           blueDroppability = true;
       };
     }
-    if ( redDroppability == true && redsTurn == true ){
+    if ( redDroppability == true && redsTurn == true && gameOver == false ){
       redsTurn = false
       gameMessage.innerHTML = "BLUE'S TURN"
       gameMessage.className = "float-right text-blue-900 text-xl"
       gameInfo.className = "float-left text-yellow-400 font-bold text-2xl"
       redScore.className = "m-auto text-red-900 text-2xl font-bold"
       blueScore.className = "m-auto text-blue-900 text-2xl font-bold border-4 border-blue-900 rounded-lg px-2"
-
+      dropBlueSphereMaterial.opacity = .9
+      dropRedSphereMaterial.opacity = .4
       draggable.geometry.dispose
       draggable.material.dispose
       scene.remove( draggable )
@@ -775,14 +767,15 @@ window.addEventListener('pointerdown', event => {
       redsScore += adjustedPoints
       redScore.innerHTML = "RED: " + redsScore
     }
-    if ( blueDroppability == true && redsTurn == false ){
+    if ( blueDroppability == true && redsTurn == false && gameOver == false ){
       redsTurn = true
       gameMessage.innerHTML = "RED'S TURN"
       gameMessage.className = "float-left text-red-900 text-xl"
       gameInfo.className = "float-right text-yellow-400 font-bold text-2xl"
       blueScore.className = "m-auto text-blue-900 text-2xl font-bold"
       redScore.className = "m-auto text-red-900 text-2xl font-bold border-4 border-red-900 rounded-lg px-2"
-
+      dropBlueSphereMaterial.opacity = .4
+      dropRedSphereMaterial.opacity = .9
       draggable.geometry.dispose
       draggable.material.dispose
       scene.remove( draggable )
