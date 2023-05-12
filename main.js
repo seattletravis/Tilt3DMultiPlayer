@@ -24,8 +24,6 @@ const gameInfo = document.getElementById("gameInfo")
 gameInfo.addEventListener("mouseover", ()=>{ gameInfo.className = "float-right text-blue-600 font-bold text-2xl" })
 gameInfo.addEventListener("mouseout", ()=>{ gameInfo.className = "float-right text-yellow-400 font-bold text-2xl" })
 
-
-
 //create physics engine - initialize CANNON
 const physicsWorld = new CANNON.World({
   gravity: new CANNON.Vec3(0, gravityMaxValue, 0), //Ramp Gravity up in Function
@@ -244,17 +242,15 @@ renderer.setPixelRatio(window.devicePixelRatio);
 renderer.shadowMap.enabled = true;
 
 // add ambient light source
-const light = new THREE.AmbientLight( 0xFFFFFF, 0.3 );
+const light = new THREE.AmbientLight( 0xFFFFFF, .3 );
 scene.add( light );
 
 //add pano as BG
 var panoGeometry = new THREE.SphereGeometry( 50, 60, 40 );
   panoGeometry.scale( - 1, 1, 1 );
-
   var panoMaterial = new THREE.MeshBasicMaterial( {
     map: new THREE.TextureLoader().load( './tower_images/pano.jpg' )
   } );
-
   var panoMesh = new THREE.Mesh( panoGeometry, panoMaterial );
   panoMesh.position.set(0, 0, 0)
   scene.add( panoMesh );
@@ -300,7 +296,7 @@ const lineGeometry = new THREE.BufferGeometry().setFromPoints( points );
 const lineVisual = new THREE.Line( lineGeometry, lineMaterial );
 scene.add(lineVisual)
 
-// lineVisual.material.color.setHex(0x990000)
+
 
 //make a round table Leg
 const tableLegBody = new CANNON.Body({
@@ -323,8 +319,18 @@ tableLegVisualBody.quaternion.copy(tableLegBody.quaternion)
 
 //Drop Markers Make 2 Drop Tile Markers for Scoring Points
 const dropSphereGeopmetry = new THREE.SphereGeometry(sphereSize, 15, 15)
-const dropRedSphereMaterial = new THREE.MeshLambertMaterial({ color: 0xff0000 })
-const dropBlueSphereMaterial = new THREE.MeshLambertMaterial({ color: 0x0000ff })
+const dropRedSphereMaterial = new THREE.MeshPhysicalMaterial({ 
+  color: 0xff0000,
+  metalness: 0.1,
+  opacity: 0.8,
+  roughness: 0.4,
+})
+const dropBlueSphereMaterial = new THREE.MeshPhysicalMaterial({ 
+  color: 0x0000ff,   
+  metalness: 0.1,
+  opacity: 0.8,
+  roughness: 0.4,
+})
 let redDrop = new THREE.Mesh(dropSphereGeopmetry, dropRedSphereMaterial)
 redDrop.position.set(scoreRadialDistance * Math.cos(redAngle), scoreBallY, scoreRadialDistance * Math.sin(redAngle))
 scene.add(redDrop)
@@ -399,6 +405,9 @@ const blockToBlockContact = new CANNON.ContactMaterial(
 physicsWorld.addContactMaterial(blockToBlockContact);
 
 const resetMeter = document.getElementById('resetMeter')
+
+
+
 // resetMeter.value = 0
 // create top block function -------------------///////////////////////WORKING HERE!!!!!
 const topBlockTexture = new THREE.TextureLoader().load('./tower_images/wood.jpg')
@@ -423,34 +432,51 @@ topBlockMesh.quaternion.copy(topBlock.quaternion)
 
 
 //get mid x and z of topblock center
+let redsTurn = true
 let resetButtonPressed = false
 const gameMessage = document.getElementById('gameControl')
-// gameMessage.innerHTML = 'Hello World'
 const maxScore = document.getElementById('maxScore')
 let adjustedPoints
+const dangerMeterText = document.getElementById('dangerMeterText')
+
+dangerMeterText.style.color = 'rgb(0, 0, 255'
+lineVisual.material.color.setRGB(0, 0, 255)
 
 function getCenterOfTopBlock(){
   let xPosSqr = Math.abs(topBlock.position.x) * Math.abs(topBlock.position.x)
   let zPosSqr = Math.abs(topBlock.position.z) * Math.abs(topBlock.position.z)
   let offCenterDistance = Math.sqrt(xPosSqr + zPosSqr)
+
+  let colorOffsetRed = Math.ceil(offCenterDistance*500)
+  let colorOffsetGreen = 255 - colorOffsetRed
+  if(colorOffsetRed > 255){ colorOffsetRed = 255 }
+  if (colorOffsetGreen < 0){ colorOffsetGreen = 0 }
+  
+  dangerMeterText.style.color = 'rgb('+colorOffsetRed+','+colorOffsetGreen+', 0'
+  lineVisual.material.color.setRGB(colorOffsetRed, colorOffsetGreen, 0)
+  console.log(colorOffsetRed, colorOffsetGreen)
+
   resetMeter.value = offCenterDistance * resetSensitivity
   adjustedPoints = 100 - Math.floor(resetMeter.value * 10)
-
+ 
   maxScore.innerHTML = "(MAX SCORE: " + adjustedPoints + ")"
   if (resetMeter.value >= 10 && resetButtonPressed == false){
     resetButtonPressed = true
     explodeTower()
     if (redsScore > bluesScore){
       gameMessage.innerHTML = "RED WINS - BLUE DROOLS!"
-      gameMessage.className = "text-red-600 text-xl"
+      gameMessage.className = "float-left text-red-600 text-xl"
+      gameInfo.className = "float-right text-yellow-400 font-bold text-2xl"
+
     }else if (redsScore < bluesScore){
       gameMessage.innerHTML = "BLUE WINS - BETTER LUCK NEXT TIME RED!"
-      gameMessage.className = "text-blue-600 text-xl"
-
+      gameMessage.className = "float-left text-blue-600 text-xl"
+      gameInfo.className = "float-right text-yellow-400 font-bold text-2xl"
 
     }else{
       gameMessage.innerHTML = "DRAW - PLAY AGAIN?"
-      gameMessage.className = "text-yellow-400 text-xl"
+      gameMessage.className = "float-left text-yellow-400 text-xl"
+      gameInfo.className = "float-right text-yellow-400 font-bold text-2xl"
 
     }
 
@@ -730,7 +756,14 @@ window.addEventListener('pointerdown', event => {
           blueDroppability = true;
       };
     }
-    if ( redDroppability == true ){
+    if ( redDroppability == true && redsTurn == true ){
+      redsTurn = false
+      gameMessage.innerHTML = "BLUE'S TURN"
+      gameMessage.className = "float-right text-blue-900 text-xl"
+      gameInfo.className = "float-left text-yellow-400 font-bold text-2xl"
+      redScore.className = "m-auto text-red-900 text-2xl font-bold"
+      blueScore.className = "m-auto text-blue-900 text-2xl font-bold border-4 border-blue-900 rounded-lg px-2"
+
       draggable.geometry.dispose
       draggable.material.dispose
       scene.remove( draggable )
@@ -742,7 +775,14 @@ window.addEventListener('pointerdown', event => {
       redsScore += adjustedPoints
       redScore.innerHTML = "RED: " + redsScore
     }
-    if ( blueDroppability == true ){
+    if ( blueDroppability == true && redsTurn == false ){
+      redsTurn = true
+      gameMessage.innerHTML = "RED'S TURN"
+      gameMessage.className = "float-left text-red-900 text-xl"
+      gameInfo.className = "float-right text-yellow-400 font-bold text-2xl"
+      blueScore.className = "m-auto text-blue-900 text-2xl font-bold"
+      redScore.className = "m-auto text-red-900 text-2xl font-bold border-4 border-red-900 rounded-lg px-2"
+
       draggable.geometry.dispose
       draggable.material.dispose
       scene.remove( draggable )
