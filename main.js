@@ -25,7 +25,7 @@ gameInfo.addEventListener("mouseover", ()=>{ gameInfo.className = "float-right t
 gameInfo.addEventListener("mouseout", ()=>{ gameInfo.className = "float-right text-yellow-400 font-bold text-2xl" })
 
 gameInfo.addEventListener("click", function() {
-  alert("Red player goes first & then each player takes turns. \nClick to grab a tile & release to drop tile.\nYou may grab & drop multiple tiles during your turn.\nRelease a tile over your bubble to score points & end your turn.\nBe Careful! If the round top-block goes too far off center… \nKa-bloo-ee! The tower explodes and the game ends.\nUse the HOVER OVER CONTROLS to move camera postion,\nor (“a, s, d, w” - Left, Down, Right, Up & “i, o” - In, Out.\)\nScoring:\nScores for each turn can be anywhere between 0-100 points.\nThe more off-center the top-block is, the less points are scorable\n \(as indicated by the “Maximum Score” readout\)");
+  alert("Red player goes first & then each player takes turns. \nClick to grab a tile & release to drop tile.\nYou may grab & drop multiple tiles during your turn.\nRelease a tile over your bubble to score points & end your turn.\nBe Careful! If the round top-block goes too far off center… \nKa-bloo-ee! The tower explodes and the game ends.\nUse the HOVER OVER CONTROLS to move camera postion,\nor (“a, s, d, w” - Left, Down, Right, Up & “i, o” - In, Out.\)\nScoring:\nScore range is 0-100 points per turn.\nThe more off-center the top-block is, the less points are scorable\n\(as indicated by the “MAX SCORE” readout\) \nTIP: Nudge the tower back into the center to score more points.");
 }
 
 )
@@ -745,6 +745,9 @@ window.addEventListener('pointerdown', event => {
       gameMessage.innerHTML = "BLUE'S TURN"
       gameMessage.className = "float-right text-blue-900 text-xl font-bold"
       gameInfo.className = "float-left text-yellow-400 font-bold text-2xl"
+      gameInfo.addEventListener("mouseover", ()=>{ gameInfo.className = "float-left text-blue-600 font-bold text-2xl" })
+      gameInfo.addEventListener("mouseout", ()=>{ gameInfo.className = "float-left text-yellow-400 font-bold text-2xl" })
+
       redScore.className = "m-auto text-red-600 text-2xl font-bold"
       blueScore.className = "m-auto text-blue-900 text-2xl font-bold border-4 border-blue-900 rounded-lg px-2"
       dropBlueSphereMaterial.opacity = 1
@@ -765,6 +768,9 @@ window.addEventListener('pointerdown', event => {
       gameMessage.innerHTML = "RED'S TURN"
       gameMessage.className = "float-left text-red-600 text-xl font-bold"
       gameInfo.className = "float-right text-yellow-400 font-bold text-2xl"
+      gameInfo.addEventListener("mouseover", ()=>{ gameInfo.className = "float-right text-blue-600 font-bold text-2xl" })
+      gameInfo.addEventListener("mouseout", ()=>{ gameInfo.className = "float-right text-yellow-400 font-bold text-2xl" })
+
       blueScore.className = "m-auto text-blue-900 text-2xl font-bold"
       redScore.className = "m-auto text-red-600 text-2xl font-bold border-4 border-red-600 rounded-lg px-2"
       dropBlueSphereMaterial.opacity = .3
