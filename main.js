@@ -24,6 +24,12 @@ const gameInfo = document.getElementById("gameInfo")
 gameInfo.addEventListener("mouseover", ()=>{ gameInfo.className = "float-right text-blue-600 font-bold text-2xl" })
 gameInfo.addEventListener("mouseout", ()=>{ gameInfo.className = "float-right text-yellow-400 font-bold text-2xl" })
 
+gameInfo.addEventListener("click", function() {
+  alert("Red player goes first & then each player takes turns. \nClick to grab a tile & release to drop tile.\nYou may grab & drop multiple tiles during your turn.\nRelease a tile over your bubble to score points & end your turn.\nBe Careful! If the round top-block goes too far off center… \nKa-bloo-ee! The tower explodes and the game ends.\nUse the HOVER OVER CONTROLS to move camera postion,\nor (“a, s, d, w” - Left, Down, Right, Up & “i, o” - In, Out.\)\nScoring:\nScores for each turn can be anywhere between 0-100 points.\nThe more off-center the top-block is, the less points are scorable\n \(as indicated by the “Maximum Score” readout\)");
+}
+
+)
+
 //create physics engine - initialize CANNON
 const physicsWorld = new CANNON.World({
   gravity: new CANNON.Vec3(0, gravityMaxValue, 0), //Ramp Gravity up in Function
@@ -65,7 +71,8 @@ const buttonRight = document.getElementById('buttonRight')
 const buttonIn = document.getElementById('buttonIn')
 const buttonOut = document.getElementById('buttonOut')
 let radialDistance = camera.position.x
-let cameraAngle = Math.PI*.785
+let angleAugment = .82
+let cameraAngle = 2 * Math.PI * (0.5 + angleAugment)
 
 camera.position.x = radialDistance * Math.cos(cameraAngle)
 camera.position.z = radialDistance * Math.sin(cameraAngle)
@@ -75,9 +82,8 @@ camera.lookAt(0, camera.position.y + camPosLookDif, 0)
 let sphereSize = 1
 let scoreBallY = -4
 let scoreRadialDistance = 10
-let redAngle = 2 * Math.PI * .83
-let blueAngle = 2 * Math.PI * .96
-
+let redAngle = 2 * Math.PI * (0.95 + angleAugment)
+let blueAngle = 2 * Math.PI * (0.05 + angleAugment)
 
 //Move Camera Up
 repeatWhileMouseOver(buttonUp, moveCameraUp, 5)
@@ -134,8 +140,6 @@ repeatWhileMouseOver(buttonIn, moveCameraIn, 10)
 function moveCameraIn() {
   if (radialDistance <= 4){ return }
   radialDistance -= 0.02
-  //y adjust
-  // camera.position.y += 0.01
   camera.position.x = radialDistance * Math.cos(cameraAngle)
   camera.position.z = radialDistance * Math.sin(cameraAngle)
   buttonIn.className = 'text-green-600 border-4 border-green-600  bg-blue-600 inline-block py-1 rounded-full px-8'
@@ -145,8 +149,6 @@ function moveCameraIn() {
 repeatWhileMouseOver(buttonOut, moveCameraOut, 10)
 function moveCameraOut() {
   radialDistance += 0.02
-  //y adjust
-  // camera.position.y -= 0.02
   camera.position.x = radialDistance * Math.cos(cameraAngle)
   camera.position.z = radialDistance * Math.sin(cameraAngle)
   buttonOut.className = 'text-green-600 border-4 border-green-600  bg-blue-600 inline-block py-1 rounded-full px-8'
@@ -154,7 +156,6 @@ function moveCameraOut() {
 
 const buttonEnter = document.getElementById('enterButton');
 const buttonGithub = document.getElementById('githubButton')
-
 
 //load state for buttons
 const btnDown = 'text-green-600 border-4 border-green-600 bg-yellow-400 inline-block py-1 rounded-full px-4'
@@ -210,14 +211,8 @@ document.addEventListener("keypress", function onEvent(event) {
   else if (event.key === "d") { moveCameraRight() }
   else if (event.key === "w") { moveCameraUp(); moveCameraUp(); moveCameraUp() }
   else if (event.key === "s") { moveCameraDown(); moveCameraDown() }
-  else if (event.key === "i") {
-    moveCameraIn()
-    moveCameraIn()
-  }
-  else if (event.key === 'o') {
-    moveCameraOut()
-    moveCameraOut()
-  }
+  else if (event.key === "i") { moveCameraIn() }
+  else if (event.key === 'o') { moveCameraOut() }
   else { return }
 });
 
@@ -249,7 +244,7 @@ scene.add( light );
 var panoGeometry = new THREE.SphereGeometry( 50, 60, 40 );
   panoGeometry.scale( - 1, 1, 1 );
   var panoMaterial = new THREE.MeshBasicMaterial( {
-    map: new THREE.TextureLoader().load( './tower_images/pano.jpg' )
+    map: new THREE.TextureLoader().load( './tower_images/pano1.jpg' )
   } );
   var panoMesh = new THREE.Mesh( panoGeometry, panoMaterial );
   panoMesh.position.set(0, 0, 0)
@@ -295,8 +290,6 @@ points.push( new THREE.Vector3( 0, 100, 0 ) );
 const lineGeometry = new THREE.BufferGeometry().setFromPoints( points );
 const lineVisual = new THREE.Line( lineGeometry, lineMaterial );
 scene.add(lineVisual)
-
-
 
 //make a round table Leg
 const tableLegBody = new CANNON.Body({
@@ -462,20 +455,20 @@ function getCenterOfTopBlock(){
     explodeTower()
     if (redsScore > bluesScore){
       gameMessage.innerHTML = "RED WINS - BLUE DROOLS!"
-      gameMessage.className = "float-left text-red-600 text-xl"
+      gameMessage.className = "float-left text-red-600 text-xl font-bold"
       gameInfo.className = "float-right text-yellow-400 font-bold text-2xl"
     }else if (redsScore < bluesScore){
       gameMessage.innerHTML = "BLUE WINS - BETTER LUCK NEXT TIME RED!"
-      gameMessage.className = "float-left text-blue-600 text-xl"
+      gameMessage.className = "float-left text-blue-600 text-xl font-bold"
       gameInfo.className = "float-right text-yellow-400 font-bold text-2xl"
     }else{
       gameMessage.innerHTML = "DRAW - PLAY AGAIN?"
-      gameMessage.className = "float-left text-yellow-400 text-xl"
+      gameMessage.className = "float-left text-yellow-400 text-xl font-bold"
       gameInfo.className = "float-right text-yellow-400 font-bold text-2xl"
     }
   }
 }
-///////////////////////////////////////CREATE EXPLODE TRIGGER MECHANISM /////////////////////////////////
+
 
 //create tower Function - makes calls to createBlock()
   for(let i = 0; i <= 17; i++){ //use i <= 17 for 54 blocks
@@ -750,11 +743,11 @@ window.addEventListener('pointerdown', event => {
     if ( redDroppability == true && redsTurn == true && gameOver == false ){
       redsTurn = false
       gameMessage.innerHTML = "BLUE'S TURN"
-      gameMessage.className = "float-right text-blue-900 text-xl"
+      gameMessage.className = "float-right text-blue-900 text-xl font-bold"
       gameInfo.className = "float-left text-yellow-400 font-bold text-2xl"
-      redScore.className = "m-auto text-red-900 text-2xl font-bold"
+      redScore.className = "m-auto text-red-600 text-2xl font-bold"
       blueScore.className = "m-auto text-blue-900 text-2xl font-bold border-4 border-blue-900 rounded-lg px-2"
-      dropBlueSphereMaterial.opacity = .9
+      dropBlueSphereMaterial.opacity = 1
       dropRedSphereMaterial.opacity = .4
       draggable.geometry.dispose
       draggable.material.dispose
@@ -770,12 +763,12 @@ window.addEventListener('pointerdown', event => {
     if ( blueDroppability == true && redsTurn == false && gameOver == false ){
       redsTurn = true
       gameMessage.innerHTML = "RED'S TURN"
-      gameMessage.className = "float-left text-red-900 text-xl"
+      gameMessage.className = "float-left text-red-600 text-xl font-bold"
       gameInfo.className = "float-right text-yellow-400 font-bold text-2xl"
       blueScore.className = "m-auto text-blue-900 text-2xl font-bold"
-      redScore.className = "m-auto text-red-900 text-2xl font-bold border-4 border-red-900 rounded-lg px-2"
-      dropBlueSphereMaterial.opacity = .4
-      dropRedSphereMaterial.opacity = .9
+      redScore.className = "m-auto text-red-600 text-2xl font-bold border-4 border-red-600 rounded-lg px-2"
+      dropBlueSphereMaterial.opacity = .3
+      dropRedSphereMaterial.opacity = 1
       draggable.geometry.dispose
       draggable.material.dispose
       scene.remove( draggable )
