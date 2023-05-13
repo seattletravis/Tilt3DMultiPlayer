@@ -323,7 +323,7 @@ const dropBlueSphereMaterial = new THREE.MeshPhysicalMaterial({
   color: 0x0000ff,   
   transparent: true,
   metalness: 0.1,
-  opacity: 0.4,
+  opacity: 0.3,
   roughness: 0.4,
 })
 let redDrop = new THREE.Mesh(dropSphereGeopmetry, dropRedSphereMaterial)
@@ -673,7 +673,7 @@ let jointConstraint
 let currentBody
 let isDragging = false
 
-// Initialize & allow gameplay after tiles have settled down
+// Initialize & allow gameplay
 let gameOver = false
 window.addEventListener('pointerdown', event => {
   clickMouse.x = ((event.clientX - sidePanel.offsetWidth) / canvasContainer.offsetWidth) * 2 - 1;
@@ -683,8 +683,8 @@ window.addEventListener('pointerdown', event => {
   if (found.length > 0 && found[0].object.userData.draggable){
     wakeUpBlocks() //Make a call to the wakeUpBlocks Function
     draggable = found[0].object
-    draggable.material.transparent = true;
-    draggable.material.opacity = 0.5;
+    // draggable.material.transparent = true;
+    // draggable.material.opacity = 0.5;
     holdingTile = true;
     const hitPoint = getHitPoint(event.clientX, event.clientY, draggable, camera)
     if (!hitPoint){ return }
@@ -751,7 +751,7 @@ window.addEventListener('pointerdown', event => {
       redScore.className = "m-auto text-red-600 text-2xl font-bold"
       blueScore.className = "m-auto text-blue-900 text-2xl font-bold border-4 border-blue-900 rounded-lg px-2"
       dropBlueSphereMaterial.opacity = 1
-      dropRedSphereMaterial.opacity = .4
+      dropRedSphereMaterial.opacity = .3
       draggable.geometry.dispose
       draggable.material.dispose
       scene.remove( draggable )
@@ -773,7 +773,7 @@ window.addEventListener('pointerdown', event => {
 
       blueScore.className = "m-auto text-blue-900 text-2xl font-bold"
       redScore.className = "m-auto text-red-600 text-2xl font-bold border-4 border-red-600 rounded-lg px-2"
-      dropBlueSphereMaterial.opacity = .3
+      dropBlueSphereMaterial.opacity = .2
       dropRedSphereMaterial.opacity = 1
       draggable.geometry.dispose
       draggable.material.dispose
