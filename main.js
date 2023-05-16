@@ -40,7 +40,7 @@ physicsWorld.allowSleep = true;
 physicsWorld.defaultContactMaterial.contactEquationRestitution = 0.0001 //default = ?
 physicsWorld.defaultContactMaterial.contactEquationStiffness = 500000000//default 50,000,000
 // physicsWorld.defaultContactMaterial.friction = 0 //default = 0.3
-physicsWorld.defaultContactMaterial.frictionEquationRelaxation = 1 //default = 3
+physicsWorld.defaultContactMaterial.frictionEquationRelaxation = 1 //defauuttongitlt = 3
 physicsWorld.defaultContactMaterial.contactEquationRelaxationTime = 1
 // console.log(physicsWorld.defaultContactMaterial)
 
@@ -60,6 +60,7 @@ const buttonDown = document.getElementById('buttonDown')
 const buttonRight = document.getElementById('buttonRight')
 const buttonIn = document.getElementById('buttonIn')
 const buttonOut = document.getElementById('buttonOut')
+const buttonGithub = document.getElementById('githubButton')
 let radialDistance = camera.position.x
 let angleAugment = .82
 let cameraAngle = 2 * Math.PI * (0.5 + angleAugment)
@@ -144,8 +145,6 @@ function moveCameraOut() {
   buttonOut.className = 'text-green-600 border-4 border-green-600  bg-blue-600 inline-block py-1 rounded-full px-8'
 }
 
-const buttonEnter = document.getElementById('enterButton');
-const buttonGithub = document.getElementById('githubButton')
 
 //load state for buttons
 const btnDown = 'text-green-600 border-4 border-green-600 bg-yellow-400 inline-block py-1 rounded-full px-4'
@@ -164,13 +163,9 @@ buttonRight.className = btnRight
 buttonUp.className = btnUp
 buttonIn.className = btnIn
 buttonOut.className = btnOut
-buttonEnter.className = btnEnter
+// buttonEnter.className = btnEnter
 buttonGithub.className = btnGithub
 
-repeatWhileMouseOver(buttonEnter, blueEnter, 10)
-function blueEnter() {
-  enterButton.className = 'text-green-600 bg-blue-600 font-bold text-center border-4 border-green-600 inline-block text-xl px-4 rounded-full'
-}
 repeatWhileMouseOver(buttonGithub, blueGithub, 10)
 function blueGithub() {
   githubButton.className = 'text-green-600 bg-blue-600 font-bold text-center border-4 border-green-600 inline-block text-xl px-4 rounded-full'
@@ -190,7 +185,6 @@ function repeatWhileMouseOver(element, action, milliseconds) {
     buttonUp.className = btnUp
     buttonIn.className = btnIn
     buttonOut.className = btnOut
-    buttonEnter.className = btnEnter
     buttonGithub.className = btnGithub
     clearInterval(interval);
   });
