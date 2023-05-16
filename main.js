@@ -197,6 +197,7 @@ document.addEventListener("keypress", function onEvent(event) {
   else if (event.key === "s") { moveCameraDown(); moveCameraDown() }
   else if (event.key === "i") { moveCameraIn() }
   else if (event.key === 'o') { moveCameraOut() }
+  else if (event.key === 'r') { resetTower() }
   else { return }
 });
 
