@@ -4,7 +4,7 @@ import { Flip } from "gsap/Flip";
 import { EaselPlugin } from "gsap/EaselPlugin";
 import { TextPlugin } from "gsap/TextPlugin";
 import * as THREE from 'three';
-import { RoundedBoxGeometry } from './node_modules/three/examples/jsm/geometries/RoundedBoxGeometry.js';
+// import { RoundedBoxGeometry } from './node_modules/three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import * as CANNON from 'cannon-es';
 // import CannonDebugger from 'cannon-es-debugger';
 // import { space } from 'postcss/lib/list';
@@ -19,16 +19,6 @@ const sidePanel = document.querySelector('#sidePanel') // add sidePanel to the D
 let gravityMaxValue = -4
 let blockSleepSpeed = .2
 let resetSensitivity = 16
-
-const gameInfo = document.getElementById("gameInfo")
-gameInfo.addEventListener("mouseover", ()=>{ gameInfo.className = "float-right text-blue-600 font-bold text-2xl" })
-gameInfo.addEventListener("mouseout", ()=>{ gameInfo.className = "float-right text-yellow-400 font-bold text-2xl" })
-
-gameInfo.addEventListener("click", function() {
-  alert("Red player goes first & then each player takes turns. \nClick to grab a tile & release to drop tile.\nYou may grab & drop multiple tiles during your turn.\nRelease a tile over your bubble to score points & end your turn.\nBe Careful! If the round top-block goes too far off center… \nKa-bloo-ee! The tower explodes and the game ends.\nUse the HOVER OVER CONTROLS to move camera postion,\nor (“a, s, d, w” - Left, Down, Right, Up & “i, o” - In, Out.\)\nScoring:\nScore range is 0-100 points per turn.\nThe more off-center the top-block is, the less points are scorable\n\(as indicated by the “MAX SCORE” readout\) \nTIP: Nudge the tower back into the center to score more points.");
-}
-
-)
 
 //create physics engine - initialize CANNON
 const physicsWorld = new CANNON.World({
@@ -164,8 +154,8 @@ const btnRight = 'text-green-600  border-4 border-green-600 bg-yellow-400 inline
 const btnUp = 'text-green-600  border-4 border-green-600 bg-yellow-400 inline-block py-1 rounded-full px-8'
 const btnIn = 'text-green-600  border-4 border-green-600 bg-yellow-400 inline-block py-1 rounded-full px-8'
 const btnOut = 'text-green-600  border-4 border-green-600 bg-yellow-400 inline-block py-1 rounded-full px-8'
-const btnEnter = 'text-green-600 bg-yellow-400 font-bold text-center border-4 border-green-600 inline-block text-2xl px-4 rounded-full'
-const btnGithub = 'text-green-600 bg-yellow-400 font-bold text-center border-4 border-green-600 inline-block text-2xl px-4 rounded-full'
+const btnEnter = 'text-green-600 bg-yellow-400 font-bold text-center border-4 border-green-600 inline-block text-xl px-4 rounded-full'
+const btnGithub = 'text-green-600 bg-yellow-400 font-bold text-center border-4 border-green-600 inline-block text-xl px-4 rounded-full'
 
 //send classes to html
 buttonDown.className = btnDown
@@ -179,11 +169,11 @@ buttonGithub.className = btnGithub
 
 repeatWhileMouseOver(buttonEnter, blueEnter, 10)
 function blueEnter() {
-  enterButton.className = 'text-green-600 bg-blue-600 font-bold text-center border-4 border-green-600 inline-block text-2xl px-4 rounded-full'
+  enterButton.className = 'text-green-600 bg-blue-600 font-bold text-center border-4 border-green-600 inline-block text-xl px-4 rounded-full'
 }
 repeatWhileMouseOver(buttonGithub, blueGithub, 10)
 function blueGithub() {
-  githubButton.className = 'text-green-600 bg-blue-600 font-bold text-center border-4 border-green-600 inline-block text-2xl px-4 rounded-full'
+  githubButton.className = 'text-green-600 bg-blue-600 font-bold text-center border-4 border-green-600 inline-block text-xl px-4 rounded-full'
 }
 
 //Hover Controls for Camera Controls
@@ -360,7 +350,6 @@ const blockVisualArray = [];
 const slipperyMaterial = new CANNON.Material();
 const wood = new THREE.TextureLoader().load('./tower_images/wood.jpg')
 
-
 //create block function
 function createBlock(blockName, blockPosition, blockShape, blockMeshArray){
   const mass = 0.00001;
@@ -375,10 +364,10 @@ function createBlock(blockName, blockPosition, blockShape, blockMeshArray){
     blockName.position.set(blockPosition.X, blockPosition.Y, blockPosition.Z);
     physicsWorld.addBody(blockName)  
     blockPhysicsArray.push(blockName)//add the blocks to List blockPhysicsArray
-    const roundedBoxGeometry = new RoundedBoxGeometry(blockShape.L*2, blockShape.H*2, blockShape.W*2, 10, .04)
+    const boxGeometry = new THREE.BoxGeometry(blockShape.L*2, blockShape.H*2, blockShape.W*2)
     blockName = new THREE.Mesh(
       // new THREE.BoxGeometry(blockShape.L*2, blockShape.H*2, blockShape.W*2),
-      roundedBoxGeometry,
+      boxGeometry,
       blockMeshArray
     // new THREE.MeshStandardMaterial({
     //   map: woodTexture
@@ -400,8 +389,6 @@ const blockToBlockContact = new CANNON.ContactMaterial(
 physicsWorld.addContactMaterial(blockToBlockContact);
 
 const resetMeter = document.getElementById('resetMeter')
-
-// create top block function -------------------///////////////////////WORKING HERE!!!!!
 const topBlockTexture = new THREE.TextureLoader().load('./tower_images/wood.jpg')
 const mass = 0.00001;
 const topBlock = new CANNON.Body({
@@ -430,7 +417,6 @@ const gameMessage = document.getElementById('gameControl')
 const maxScore = document.getElementById('maxScore')
 let adjustedPoints
 const dangerMeterText = document.getElementById('dangerMeterText')
-
 dangerMeterText.style.color = 'rgb(0, 0, 255'
 lineVisual.material.color.setRGB(0, 0, 255)
 
@@ -455,16 +441,13 @@ function getCenterOfTopBlock(){
     explodeTower()
     if (redsScore > bluesScore){
       gameMessage.innerHTML = "RED WINS - BLUE DROOLS!"
-      gameMessage.className = "float-left text-red-600 text-xl font-bold"
-      gameInfo.className = "float-right text-yellow-400 font-bold text-2xl"
+      gameMessage.className = "text-center text-red-600 text-xl font-bold"
     }else if (redsScore < bluesScore){
       gameMessage.innerHTML = "BLUE WINS - BETTER LUCK NEXT TIME RED!"
-      gameMessage.className = "float-left text-blue-600 text-xl font-bold"
-      gameInfo.className = "float-right text-yellow-400 font-bold text-2xl"
+      gameMessage.className = "text-center text-blue-600 text-xl font-bold"
     }else{
       gameMessage.innerHTML = "DRAW - PLAY AGAIN?"
-      gameMessage.className = "float-left text-yellow-400 text-xl font-bold"
-      gameInfo.className = "float-right text-yellow-400 font-bold text-2xl"
+      gameMessage.className = "text-center text-yellow-400 text-xl font-bold"
     }
   }
 }
@@ -743,11 +726,7 @@ window.addEventListener('pointerdown', event => {
     if ( redDroppability == true && redsTurn == true && gameOver == false ){
       redsTurn = false
       gameMessage.innerHTML = "BLUE'S TURN"
-      gameMessage.className = "float-right text-blue-900 text-xl font-bold"
-      gameInfo.className = "float-left text-yellow-400 font-bold text-2xl"
-      gameInfo.addEventListener("mouseover", ()=>{ gameInfo.className = "float-left text-blue-600 font-bold text-2xl" })
-      gameInfo.addEventListener("mouseout", ()=>{ gameInfo.className = "float-left text-yellow-400 font-bold text-2xl" })
-
+      gameMessage.className = "text-center text-blue-900 text-xl font-bold"
       redScore.className = "m-auto text-red-600 text-2xl font-bold"
       blueScore.className = "m-auto text-blue-900 text-2xl font-bold border-4 border-blue-900 rounded-lg px-2"
       dropBlueSphereMaterial.opacity = 1
@@ -766,11 +745,7 @@ window.addEventListener('pointerdown', event => {
     if ( blueDroppability == true && redsTurn == false && gameOver == false ){
       redsTurn = true
       gameMessage.innerHTML = "RED'S TURN"
-      gameMessage.className = "float-left text-red-600 text-xl font-bold"
-      gameInfo.className = "float-right text-yellow-400 font-bold text-2xl"
-      gameInfo.addEventListener("mouseover", ()=>{ gameInfo.className = "float-right text-blue-600 font-bold text-2xl" })
-      gameInfo.addEventListener("mouseout", ()=>{ gameInfo.className = "float-right text-yellow-400 font-bold text-2xl" })
-
+      gameMessage.className = "text-center text-red-600 text-xl font-bold"
       blueScore.className = "m-auto text-blue-900 text-2xl font-bold"
       redScore.className = "m-auto text-red-600 text-2xl font-bold border-4 border-red-600 rounded-lg px-2"
       dropBlueSphereMaterial.opacity = .2
@@ -810,6 +785,7 @@ function animate() {
   linkPhysics()
   renderer.render( scene, camera );
   getCenterOfTopBlock()
+  topBlock.sleepState = 0
 }
 
 animate();
