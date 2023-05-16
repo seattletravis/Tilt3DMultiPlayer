@@ -12,28 +12,24 @@
       <div id="sidePanel" class="border-4 border-green-600 w-1/2 flex flex-col justify-center px-2">
         <!-- TRAVIS.LAMBERTE.COM -->
         <div class="flex flex-col items-center">
-        <h1 id="enterButton" class="text-center text-green-600 px-4 text-2xl">TRAVIS.LAMBERTE.COM</h1><br>
+        <a id="enterButton" title="Back to Arcade Menu!" href="../Arcade/index.html" class="text-center text-green-600 px-4 text-2xl">TRAVIS.LAMBERTE.COM</a><br>
       </div>
         <!-- NAVAGATION PANE AND SCORE BOARD PANEL-->
         <div class="flex justify-center items-center">
 
-          <h1 id="redScore" class="m-auto text-red-600 text-2xl font-bold border-4 border-red-600 rounded-lg px-2">RED: 0</h1>
-
-          <div class="">
+          <h1 id="redScore" class="m-auto text-red-600 text-2xl font-bold border-4 border-red-600 rounded-full px-2">RED: 0</h1>
             <div class="flex font-bold justify-center">
-              <div class="flex flex-col items-center">
-                <a title="See Game Rules & Options!" id="githubButton" class="" href="../TILT3DMENU/index.html">GAME MENU</a>
-              </div>
+              <!-- <div class="flow-root"> -->
+                <h1 id="gameControl" class="text-center text-red-600 text-xl font-bold">RED'S TURN</h1>
+              <!-- </div> -->
             </div>
-          </div>
-
-          <h1 id="blueScore" class="m-auto text-blue-900 text-2xl font-bold">BLUE: 0</h1>
+          <h1 id="blueScore" class="m-auto text-blue-900 text-2xl rounded-full font-bold">BLUE: 0</h1>
 
         </div> <br>
+        <div class="flex flex-col items-center">
+          <a title="See Game Rules & Options!" id="githubButton" class="" href="../TILT3DMENU/index.html">GAME MENU</a>
+        </div><br>
         <!-- GAME CONTROLS PANEL -->
-        <div class="flow-root">
-          <h1 id="gameControl" class="text-center text-red-600 text-xl font-bold">RED'S TURN</h1>
-        </div>
         <div class="flex flex-col items-center border-2 border-green-600 rounded-lg">
 
           <br>
@@ -66,7 +62,7 @@
           <H1 class="text-white px-8">RESET: </H1> -->
           <br>
           <div class="px-8 flex flex-col items-center">
-              <button id="button1" title="Restack" class="font-bold border-4 border-white text-yellow-400 bg-red-900 border-yellow-400 inline-block px-4 py-1 rounded-full">RESET TOWER</button>
+              <button id="button1" title="Restack" class="font-bold border-4 text-green-600 bg-yellow-400 border-green-600 inline-block px-4 py-1 rounded-full">RESET TOWER</button>
               <br>
               <h1 id="dangerMeterText" class="text-red-900 text-2xl">DANGER METER</h1>
               <h1 id="maxScore" class="text-yellow-400">(MAX SCORE: 100)</h1>

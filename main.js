@@ -154,7 +154,7 @@ const btnUp = 'text-green-600  border-4 border-green-600 bg-yellow-400 inline-bl
 const btnIn = 'text-green-600  border-4 border-green-600 bg-yellow-400 inline-block py-1 rounded-full px-8'
 const btnOut = 'text-green-600  border-4 border-green-600 bg-yellow-400 inline-block py-1 rounded-full px-8'
 const btnEnter = 'text-green-600 bg-yellow-400 font-bold text-center border-4 border-green-600 inline-block text-xl px-4 rounded-full'
-const btnGithub = 'text-green-600 bg-yellow-400 font-bold text-center border-4 border-green-600 inline-block text-xl px-4 rounded-full'
+const btnGithub = 'text-green-600 bg-yellow-400 font-bold text-center border-4 border-green-600 inline-block px-4 rounded-full'
 
 //send classes to html
 buttonDown.className = btnDown
@@ -168,7 +168,7 @@ buttonGithub.className = btnGithub
 
 repeatWhileMouseOver(buttonGithub, blueGithub, 10)
 function blueGithub() {
-  githubButton.className = 'text-green-600 bg-blue-600 font-bold text-center border-4 border-green-600 inline-block text-xl px-4 rounded-full'
+  githubButton.className = 'text-green-600 bg-blue-600 font-bold text-center border-4 border-green-600 inline-block px-4 rounded-full'
 }
 
 //Hover Controls for Camera Controls
@@ -434,13 +434,13 @@ function getCenterOfTopBlock(){
     gameOver = true
     explodeTower()
     if (redsScore > bluesScore){
-      gameMessage.innerHTML = "RED WINS - BLUE DROOLS!"
+      gameMessage.innerHTML = "RED WINS!!!"
       gameMessage.className = "text-center text-red-600 text-xl font-bold"
     }else if (redsScore < bluesScore){
-      gameMessage.innerHTML = "BLUE WINS - BETTER LUCK NEXT TIME RED!"
+      gameMessage.innerHTML = "BLUE WINS!!!"
       gameMessage.className = "text-center text-blue-600 text-xl font-bold"
     }else{
-      gameMessage.innerHTML = "DRAW - PLAY AGAIN?"
+      gameMessage.innerHTML = "DRAW!"
       gameMessage.className = "text-center text-yellow-400 text-xl font-bold"
     }
   }
@@ -586,6 +586,15 @@ resetButton.addEventListener('click', function(){ //give Button functionality - 
   resetTower()
 })
 
+resetButton.addEventListener('mouseover', function(){
+  resetButton.className = "font-bold border-4 text-green-600 bg-blue-600 border-green-600 inline-block px-4 py-1 rounded-full"
+})
+resetButton.addEventListener('mouseout', ()=>{
+  resetButton.className = "font-bold border-4 text-green-600 bg-yellow-400 border-green-600 inline-block px-4 py-1 rounded-full"
+})
+
+
+
 //Get the point where raycaster hits the object
 function getHitPoint(clientX, clientY, mesh, camera) {
   const mouse = new THREE.Vector2()
@@ -722,7 +731,7 @@ window.addEventListener('pointerdown', event => {
       gameMessage.innerHTML = "BLUE'S TURN"
       gameMessage.className = "text-center text-blue-900 text-xl font-bold"
       redScore.className = "m-auto text-red-600 text-2xl font-bold"
-      blueScore.className = "m-auto text-blue-900 text-2xl font-bold border-4 border-blue-900 rounded-lg px-2"
+      blueScore.className = "m-auto text-blue-900 text-2xl font-bold border-4 border-blue-900 rounded-full px-2"
       dropBlueSphereMaterial.opacity = 1
       dropRedSphereMaterial.opacity = .3
       draggable.geometry.dispose
@@ -741,7 +750,7 @@ window.addEventListener('pointerdown', event => {
       gameMessage.innerHTML = "RED'S TURN"
       gameMessage.className = "text-center text-red-600 text-xl font-bold"
       blueScore.className = "m-auto text-blue-900 text-2xl font-bold"
-      redScore.className = "m-auto text-red-600 text-2xl font-bold border-4 border-red-600 rounded-lg px-2"
+      redScore.className = "m-auto text-red-600 text-2xl font-bold border-4 border-red-600 rounded-full px-2"
       dropBlueSphereMaterial.opacity = .2
       dropRedSphereMaterial.opacity = 1
       draggable.geometry.dispose
