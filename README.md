@@ -19,14 +19,14 @@
 <br>
 
 # ***Getting Started***
-### *navigate into a the directory you want to install the app and type:* 
+### *Navigate into a the directory you want to install the app and type:* 
 
 ```
 git clone https://github.com/seattletravis/Tilt3DMultiPlayer.git
 ```
 <br>
 
-### *to open project in the default editor, type:*
+### *To open project in the default editor, type:*
 ```
 code . 
 ```
