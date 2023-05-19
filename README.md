@@ -22,7 +22,7 @@
 ### *navigate into a the directory you want to install the app and type:* 
 
 ```
-git clone https://github.com/seattletravis/tilt3dMultiPlayer.git
+git clone https://github.com/seattletravis/Tilt3DMultiPlayer.git
 ```
 <br>
 
