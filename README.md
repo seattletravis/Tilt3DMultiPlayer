@@ -26,6 +26,11 @@ git clone https://github.com/seattletravis/Tilt3DMultiPlayer.git
 ```
 <br>
 
+### *To open project in the default editor. Change into Titl3D directory, type:*
+```
+cd Tilt3DMultiPlayer
+```
+
 ### *To open project in the default editor, type:*
 ```
 code . 
