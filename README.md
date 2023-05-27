@@ -28,10 +28,10 @@ git clone https://github.com/seattletravis/Tilt3DMultiPlayer.git
 
 ### *To open project in the default editor. Change into Titl3D directory, type:*
 ```
-cd Tilt3DMultiPlayer
+cd Tilt3DMultiPlayer/
 ```
 
-### *To open project in the default editor, type:*
+### *Then, type:*
 ```
 code . 
 ```
@@ -46,7 +46,7 @@ npm run dev
 ### *Vite will return a local web link in the terminal, hold down Ctrl + click link to view the page in developer mode*
 <br>
 
-### *If you get a resolve error for Three-JS then install three, type:*
+### *If you experience a resolve error for Three-JS then install three-js, type:*
 
 ```
 npm install three
