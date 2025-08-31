@@ -388,6 +388,39 @@ const slipperyMaterial = new CANNON.Material();
 const wood = new THREE.TextureLoader().load('./tower_images/wood.jpg');
 
 //create block function
+// function createBlock(blockName, blockPosition, blockShape, blockMeshArray) {
+// 	const mass = 0.00001;
+
+// 	const blockBody = new CANNON.Body({
+// 		mass: mass,
+// 		shape: new CANNON.Box(
+// 			new CANNON.Vec3(blockShape.L, blockShape.H, blockShape.W)
+// 		),
+// 		sleepSpeedLimit: blockSleepSpeed,
+// 		sleepTimeLimit: sleepTimeLimit,
+// 		angularDamping: 0.9,
+// 		linearDamping: 0.5,
+// 		material: slipperyMaterial,
+// 	});
+// 	blockBody.position.set(blockPosition.X, blockPosition.Y, blockPosition.Z);
+// 	blockBody.name = blockName;
+// 	physicsWorld.addBody(blockBody);
+// 	blockPhysicsArray.push(blockBody);
+
+// 	const boxGeometry = new THREE.BoxGeometry(
+// 		blockShape.L * 2,
+// 		blockShape.H * 2,
+// 		blockShape.W * 2
+// 	);
+// 	const blockMesh = new THREE.Mesh(boxGeometry, blockMeshArray);
+// 	blockMesh.castShadow = true;
+// 	blockMesh.userData.draggable = true;
+// 	blockMesh.userData.physicsBody = blockBody;
+// 	blockMesh.userData.name = blockName;
+
+// 	scene.add(blockMesh);
+// 	blockVisualArray.push(blockMesh);
+// }
 function createBlock(blockName, blockPosition, blockShape, blockMeshArray) {
 	const mass = 0.00001;
 	blockName = new CANNON.Body({
@@ -666,14 +699,23 @@ function getBody(meshUserName) {
 //Block stay asleep until nudged - results in a bug. KEEP WORKING ON THIS BUG
 function wakeUpBlocks() {
 	for (let i = 0; i < blockPhysicsArray.length; i++) {
-		// if(i > 41){
-		// physicsWorld.allowSleep = false
-		// blockPhysicsArray[i].speepSpeedLimit = 0
-		blockPhysicsArray[i].sleepState = 0;
-		topBlock.sleepState = 0;
-		// }
+		blockPhysicsArray[i].wakeUp();
+	}
+	if (topBlock) {
+		topBlock.wakeUp();
 	}
 }
+
+// function wakeUpBlocks() {
+// 	for (let i = 0; i < blockPhysicsArray.length; i++) {
+// 		// if(i > 41){
+// 		// physicsWorld.allowSleep = false
+// 		// blockPhysicsArray[i].speepSpeedLimit = 0
+// 		blockPhysicsArray[i].sleepState = 0;
+// 		topBlock.sleepState = 0;
+// 		// }
+// 	}
+// }
 // setInterval(() => { wakeUpBlocks() }, sleepInterval);
 
 //explode tower and display end of game info
@@ -891,7 +933,8 @@ window.addEventListener('pointerup', (event) => {
 			draggable.geometry.dispose;
 			draggable.material.dispose;
 			scene.remove(draggable);
-			const moveBody = getBody(draggable);
+			// const moveBody = getBody(draggable);
+			const moveBody = draggable.userData.physicsBody;
 			moveBody.position.set(0, -100, 2);
 			setTimeout(function () {
 				redDroppability = false;

@@ -51,6 +51,12 @@ code .
 npm install
 ```
 
+### _Maybe even try this if you need too...:_
+
+```
+npm audit fix --force
+```
+
 ### _In your terminal type:_
 
 ```
